@@ -1,8 +1,8 @@
 /* Author: Amen Zwa, Esq.
  * Copyright 2022 sOnit, Inc. */
 
-#ifndef BPFOR_CSV_H
-#define BPFOR_CSV_H
+#ifndef BP_CSV_H
+#define BP_CSV_H
 
 #include <stdio.h>
 
@@ -21,4 +21,4 @@ extern void delCsv(Csv* csv);
 extern void loadCsv(Csv* csv);
 extern void saveCsv(Csv* csv);
 
-#endif // BPFOR_CSV_H
+#endif // BP_CSV_H
