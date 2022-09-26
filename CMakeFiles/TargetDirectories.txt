@@ -1,0 +1,3 @@
+/Users/zwa/Documents/C/bp/CMakeFiles/bp.dir
+/Users/zwa/Documents/C/bp/CMakeFiles/edit_cache.dir
+/Users/zwa/Documents/C/bp/CMakeFiles/rebuild_cache.dir

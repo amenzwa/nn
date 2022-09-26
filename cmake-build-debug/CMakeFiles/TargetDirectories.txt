@@ -1,0 +1,3 @@
+/Users/zwa/Documents/C/bp/cmake-build-debug/CMakeFiles/bp.dir
+/Users/zwa/Documents/C/bp/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/zwa/Documents/C/bp/cmake-build-debug/CMakeFiles/rebuild_cache.dir
