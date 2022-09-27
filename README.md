@@ -1,9 +1,21 @@
 # bp
 ## *a simple back-propagation implementation in C*
 
-This is a simple implementation of [David Rumelhart](https://en.wikipedia.org/wiki/David_Rumelhart)'s back-propagation neural network algorithm. It is a direct implementation of the proof given by Rumelhart in his seminal paper [*Learning Internal Representation by Error Propagation*](https://www.gwern.net/docs/ai/nn/1986-rumelhart.pdf) (LIR). A modern, matrix-based implementation is described by [Jacek Zurada](https://en.wikipedia.org/wiki/Jacek_M._Zurada) in his classic textbook [*Introduction to Artificial Neural Systems*](https://www.amazon.com/Introduction-Artificial-Neural-Systems-Zurada/dp/053495460X) (ANS). To understand the theory, read LIR in its entirety (about 30 pages). To understand the matrix-based implementation, read chapter 4 of ANS (about 70 pages).
+This is a simple implementation of [David Rumelhart](https://en.wikipedia.org/wiki/David_Rumelhart)'s back-propagation neural network algorithm. It is intended to show modern programmers the process of converting mathematics in scientific papers into prototype code. As such, the implementation here is a direct translation of the algorithmic proof given by Rumelhart in his seminal paper [*Learning Internal Representation by Error Propagation*](https://www.gwern.net/docs/ai/nn/1986-rumelhart.pdf) (LIR).
 
-Do note that this still is a work-in-progress project. Once this project has matured somewhat, I will post a detailed article on reading peer-reviewed scientific papers, translating mathematics into prototype code, and system programming concepts on [my GitHub Pages blog](https://amenzwa.github.io). Please be patient.
+Do note that this project is a work-in-progress. Once it has matured somewhat, I will post a detailed article on reading peer-reviewed scientific papers, translating mathematics into prototype code, and the applicable system programming concepts on [my GitHub Pages blog](https://amenzwa.github.io). Please be patient.
+
+To learn the theory of back-propagation neural networks, read LIR in its entirety (about 30 pages). To understand the modern, vectorised implementation, read chapter 4 of ANS (about 70 pages) by [Jacek Zurada](https://en.wikipedia.org/wiki/Jacek_M._Zurada) in his classic textbook [*Introduction to Artificial Neural Systems*](https://www.amazon.com/Introduction-Artificial-Neural-Systems-Zurada/dp/053495460X) (ANS). Whereas LIR is written from psychology and neuroscience perspective, ANS is written from electrical engineering viewpoint.
+
+I would point out that young STEM students often under estimate the value of old publications, believing that old means irrelevant. If that were so, no one would hold Chaucer and Shakespeare in high esteem. There are three categories of textbooks in STEM: modern, classic, and vintage.
+
+Many modern texts strive to cover all the important, recent advances and applications, so their theoretical presentations necessary take a less prominent role. Modern texts are an excellent way to keep abreast with the latest developments in the field.
+
+Classic texts, especially those that were published just after the emergence of a groundbreaking idea, tend to be the best if one wishes to study that idea, in-depth. And given that they were published at the birth of an idea, their pages are not polluted with application examples and practice guides, so they are easier to read for novices interested in the underlying theory.
+
+But after half a century or so, all texts begin to show their age: their vintage examples become outdated and their vintage notations grate modern readers. Still, there are many such vintage texts that are good-reads, much like Shakespeare is. So, do not dismiss an old textbook based solely on its publication date.
+
+## *about this project*
 
 This project is implemented in standard C, and includes XOR-2 and Encoder-8, two of the several example networks given in LIR. The goal of these projects is to show programmers how to convert mathematics into prototype code, a skill essential for all programmers who work in science and engineering fields. For pedagogical purpose and for clarity, the code includes few error checks, because error checks obscure the logic. This intentional shoddiness is tolerable, since this code is not intended to be used in production.
 
@@ -21,7 +33,11 @@ for p in P # data patterns
       o[l][j] = f(net);
 ```
 
-That is a whole lot of `for` loops. But it is an honest translation of Rumelhart's algorithm to C. A more common implementation technique, however, is to use vector algebra. The data pattern is the `p` vector, the weights of the layer `l` is the `w[l]` matrix, the output of the layer `l` is the `o[l]` vector, and so on. Because vectorised implementation is well-suited to modern GPUs, which are equipped with powerful matrix manipulation pipeline, all modern implementations of the back-propagation algorithm use matrices. The matrix-based implementation is also far more compact and is easier to understand. The loopy pseudocode above reduces to the following vectorised pseudocode:
+That is a whole lot of `for` loops. But it is an honest translation of Rumelhart's algorithm to C. So, you can use this straightforward implementation to study the LIR paper.
+
+But every implementation of back-propagation you will find on the Internet, be it a prototype or a production version, will use vector algebra. Indeed, the most popular deep learning framework, [TensorFlow](https://www.tensorflow.org/), is named so because it is implemented using [tensors](https://en.wikipedia.org/wiki/Tensor). Just as vectors are extensions of scalars and matrices are extensions of vectors, tensors are extensions of matrices from 2D to $n$D. To learn more about vectors and vector spaces, study chapters 7 and 8 of [Ken Riley](https://en.wikipedia.org/wiki/Ken_Riley_(physicist))'s excellent textbook [*Mathematical Methods for Physics and Engineering*](https://www.amazon.com/Mathematical-Methods-Physics-Engineering-Comprehensive/dp/0521679710).
+
+In vectorised version, the data pattern is the `p` vector, the weights of the layer `l` is the `w[l]` matrix, the output of the layer `l` is the `o[l]` vector, and so on. Matrix-based implementation is well-suited to modern GPUs, which are equipped with powerful matrix manipulation pipelines (because transformations in [3D computer graphics](https://en.wikipedia.org/wiki/Transformation_matrix#Examples_in_3D_computer_graphics) are implemented using matrices). The matrix-based implementation is also far more compact and is easier to understand. The loopy pseudocode above reduces to the following vectorised pseudocode:
 
 ```pseudocode
 for p in P
@@ -88,5 +104,6 @@ I chose the [C programming language](https://en.wikipedia.org/wiki/C_(programmin
 
 - [*Learning Internal Representations by Error Propagation*](https://www.gwern.net/docs/ai/nn/1986-rumelhart.pdf), Rumelhart (1986)
 - [*Introduction to Artificial Neural Systems*](https://www.amazon.com/Introduction-Artificial-Neural-Systems-Zurada/dp/053495460X), Zurada (1992)
+- [*Mathematical Methods for Physics and Engineering*](https://www.amazon.com/Mathematical-Methods-Physics-Engineering-Comprehensive-ebook/dp/B00AKE1QJU), Riley (2006)
 - [*The Practice of Programming*](https://www.amazon.com/Practice-Programming-Addison-Wesley-Professional-Computing/dp/020161586X), Kernighan (1999)
 - [*The C Programming Language*](https://www.amazon.com/Programming-Language-2nd-Brian-Kernighan/dp/0131103628/ref=sr_1_1?keywords=c+programming+language&qid=1664230233&qu=eyJxc2MiOiIzLjc0IiwicXNhIjoiMy4wMCIsInFzcCI6IjIuOTIifQ%3D%3D&sprefix=c+programmin%2Caps%2C56&sr=8-1), Kernighan (1989)
