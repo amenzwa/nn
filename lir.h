@@ -1,8 +1,8 @@
 /* Author: Amen Zwa, Esq.
  * Copyright 2022 sOnit, Inc. */
 
-#ifndef LIR_BP_H
-#define LIR_BP_H
+#ifndef BP_LIR_H
+#define BP_LIR_H
 
 typedef double (* Act)(double); // activation function
 
@@ -44,4 +44,4 @@ extern void learn(int C, int P, double** ii, double** tt, Bp* bp);
 extern void recall(int P, double** ii, double** tt, Bp* bp);
 extern void dump(Bp* bp);
 
-#endif // LIR_BP_H
+#endif // BP_LIR_H

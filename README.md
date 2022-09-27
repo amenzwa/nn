@@ -44,15 +44,15 @@ The project is structured thus:
   lirmain.c
 ```
 
-The programme is written for Unix-like operating system. I do not work on Windows; neither should you. To compile and run `bp`, type in the following at a Unix command prompt:
+The programme is written for Unix-like operating system. I do not work on Windows; neither should you. To compile and run `lir`, type in the following at a Unix command prompt:
 
 ```shell
 $ cd ~/bp
 $ make clean all
 ...
-$ ./bp xor2
+$ ./lir xor2
 ...
-$ ./bp enc8
+$ ./lir enc8
 ...
 ```
 
@@ -76,7 +76,7 @@ The module `csv.[ch]` implements a simple CSV parser described in section 4.1 *C
 
 ## *experimenting on your own*
 
-If you want to experiment with your own network, create `yours.csv`, `yours-i.csv`, and `yours-t.csv` as described above, place the CSV files in the directory `./dat/`, and type `./bp yours` at the command prompt.
+If you want to experiment with your own network, create `yours.csv`, `yours-i.csv`, and `yours-t.csv` as described above, place the CSV files in the directory `./dat/`, and type `./lir yours` at the command prompt.
 
 When creating your own data files, normalise the input and target vector components to the closed interval $[0.1, 0.9]$. As explained in LIR p. 9, the asymptotic nature of the sigmoid activation function prevents the network from ever reaching $0$ or $1$ saturated values. In compensation, we keep the values within this unsaturated range.
 
