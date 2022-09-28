@@ -4,107 +4,12 @@
  * LIR: Learning Internal Representations by Error Propagation, Rumelhart (1986)
  * ANS: Introduction to Artificial Neural Systems, Zurada (1992) */
 
-#include "lir.h"
-
-#include <math.h>
-#include <printf.h>
-#include <stdbool.h>
-#include <stdlib.h>
 #include <string.h>
-
-const double wi = 0.5;  // weight initialization range
-
-static bool iszero(double x) {
-  /* The imprecision in the FPU hardware representation of real numbers,
-   * it is impossible to check for exact zero equality like x == 0.0. */
-  return fabs(x) <= 10e-12;
-}
-
-static double sqre(double x) {
-  return x * x;
-}
-
-static double randin(double lo, double hi) {
-  /* Return a random double in the range [lo, hi]. */
-  return lo + (double) random() / (double) RAND_MAX * (hi - lo);
-}
-
-/* activation functions */
-
-double rampb(double x) {
-  return x;
-}
-
-double drampb(double) {
-  return 1.0;
-}
-
-double rampu(double x) {
-  return x < 0.0 ? 0.01 : x;
-}
-
-double drampu(double x) {
-  return x < 0.0 ? 0.01 : 0.99;
-}
-
-double logisticb(double x) {
-  return 2.0 / (1.0 + exp(-x)) - 1.0; // bipolar logistic activation function; see ANS p 180
-}
-
-double dlogisticb(double x) {
-  return 0.5 * (1.0 - sqre(x)); // derivative of bipolar logistic activation function; see eq 4.18b, ANS p 179
-}
-
-double logisticu(double x) {
-  return 1.0 / (1.0 + exp(-x)); // unipolar logistic activation function; see eq 15, LIR p 9
-}
-
-double dlogisticu(double x) {
-  return x - sqre(x); // derivative of unipolar logistic activation function; see LIR p 9
-}
-
-double stepb(double x) {
-  return x < 0.0 ? -0.99 : 0.99;
-}
-
-double dstepb(double x) {
-  return iszero(x) ? 1.99 : 0.01;
-}
-
-double stepu(double x) {
-  return x < 0.0 ? 0.01 : 0.99;
-}
-
-double dstepu(double x) {
-  return iszero(x) ? 0.99 : 0.01;
-}
-
-static void setact(const char* act, Act* f, Act* df) {
-  if (strcmp(act, "rampb") == 0) {
-    *f = rampb;
-    *df = drampb;
-  } else if (strcmp(act, "rampu") == 0) {
-    *f = rampu;
-    *df = drampu;
-  } else if (strcmp(act, "logisticb") == 0) {
-    *f = logisticb;
-    *df = dlogisticb;
-  } else if (strcmp(act, "logisticu") == 0) {
-    *f = logisticu;
-    *df = dlogisticu;
-  } else if (strcmp(act, "stepb") == 0) {
-    *f = stepb;
-    *df = dstepb;
-  } else if (strcmp(act, "stepu") == 0) {
-    *f = stepu;
-    *df = dstepu;
-  } else {
-    fprintf(stderr, "ERROR: unknown activation function\n");
-    exit(1);
-  }
-}
-
-/* back-propagation network */
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
+#include "etc.h"
+#include "lir.h"
 
 Bp* newBp(const char* name, double eta, double alpha, double epsilon, int nL, int nI, const int* nN, char** act) {
   /* Create a new network.
@@ -149,7 +54,7 @@ Bp* newBp(const char* name, double eta, double alpha, double epsilon, int nL, in
       bp->w[l][j] = malloc((I + 1) * sizeof(double));
       bp->dw[l][j] = malloc((I + 1) * sizeof(double));
       for (int i = 0; i <= I; i++) {
-        bp->w[l][j][i] = randin(-wi / 2.0, +wi / 2.0); // symmetry breaking; see LIR p 10
+        bp->w[l][j][i] = randin(-WGT_RANGE / 2.0, +WGT_RANGE / 2.0); // symmetry breaking; see LIR p 10
         bp->dw[l][j][i] = 0.0;
       }
     }

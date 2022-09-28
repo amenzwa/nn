@@ -1,10 +1,10 @@
 /* Author: Amen Zwa, Esq.
  * Copyright 2022 sOnit, Inc. */
 
-#ifndef BP_LIR_H
-#define BP_LIR_H
+#ifndef NN_LIR_H
+#define NN_LIR_H
 
-typedef double (* Act)(double); // activation function
+#include "etc.h"
 
 extern double rampb(double);
 extern double drampb(double);
@@ -44,4 +44,4 @@ extern void learn(int C, int P, double** ii, double** tt, Bp* bp);
 extern void recall(int P, double** ii, double** tt, Bp* bp);
 extern void dump(Bp* bp);
 
-#endif // BP_LIR_H
+#endif // NN_LIR_H

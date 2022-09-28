@@ -7,8 +7,8 @@
 #include <time.h>
 #include <stdlib.h>
 #include <libc.h>
-#include "lir.h"
 #include "csv.h"
+#include "lir.h"
 
 static double** load(int P, const char* file) {
   Csv* csv = newCsv(file);
@@ -68,8 +68,8 @@ static void run(const char* name) {
   learn(C, P, ii, tt, bp);
   dump(bp);
   recall(P, ii, tt, bp);
-  // terminate
   delBp(bp);
+  // terminate
   toss(P, tt);
   toss(P, ii);
   for (l = 0; l < L; l++) free(act[l]);

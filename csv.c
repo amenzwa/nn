@@ -3,8 +3,9 @@
  * See section 4.1 Comma-Separated Values,
  * The Practice of Programming, Kernighan (1999) */
 
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include "csv.h"
 
 Csv* newCsv(const char* name) {

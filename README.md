@@ -1,5 +1,5 @@
-# bp
-## *a simple back-propagation implementation in C*
+# nn
+## *a simple neural network implementation in C*
 
 This is a simple implementation of [David Rumelhart](https://en.wikipedia.org/wiki/David_Rumelhart)'s back-propagation neural network algorithm. It is intended to show modern programmers the process of converting mathematics in scientific papers into prototype code. As such, the implementation here is a direct translation of the algorithmic proof given by Rumelhart in his seminal paper [*Learning Internal Representation by Error Propagation*](https://www.gwern.net/docs/ai/nn/1986-rumelhart.pdf) (LIR).
 
@@ -52,7 +52,7 @@ I will publish a matrix-based version of this project in the near future.
 The project is structured thus:
 
 ```pseudocode
-~/bp/
+~/nn/
   csv.[ch]
   dat/
     *.csv
@@ -63,7 +63,7 @@ The project is structured thus:
 The programme is written for Unix-like operating system. I do not work on Windows; neither should you. To compile and run `lir`, type in the following at a Unix command prompt:
 
 ```shell
-$ cd ~/bp
+$ cd ~/nn
 $ make clean all
 ...
 $ ./lir xor2

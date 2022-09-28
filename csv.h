@@ -1,10 +1,8 @@
 /* Author: Amen Zwa, Esq.
  * Copyright 2022 sOnit, Inc. */
 
-#ifndef BP_CSV_H
-#define BP_CSV_H
-
-#include <stdio.h>
+#ifndef NN_CSV_H
+#define NN_CSV_H
 
 #define RECLEN 16384 // CSV record length (in bytes)
 #define MAXFLD 8192 // maximum number of CSV fields per record
@@ -21,4 +19,4 @@ extern void delCsv(Csv* csv);
 extern void loadCsv(Csv* csv);
 extern void saveCsv(Csv* csv);
 
-#endif // BP_CSV_H
+#endif // NN_CSV_H
