@@ -13,7 +13,7 @@ Many modern texts strive to cover all the important, recent advances and applica
 
 Classic texts, especially those that were published just after the emergence of a groundbreaking idea, tend to be the best if one wishes to study that idea, in-depth. And given that they were published at the birth of an idea, their pages are not polluted with application examples and practice guides, so they are easier to read for novices interested in the underlying theory.
 
-But after half a century or so, all texts begin to show their age: their vintage examples become outdated and their vintage notations grate modern readers. Still, there are many such vintage texts that are good-reads, much like Shakespeare is. So, do not dismiss an old textbook based solely on its publication date.
+But after half a century or so, all texts begin to show their age: their vintage examples become outdated and their vintage notations grate modern sensibilities. Still, there are many such vintage texts that are good-reads, much like Shakespeare still is. So, do not dismiss an old textbook based solely on its publication date inside the front cover.
 
 ## *about this project*
 
@@ -72,7 +72,7 @@ $ ./lir enc8
 ...
 ```
 
-Almost every statement in `lir.[ch]` module is commented. The comments cite LIR and ANS by chapter, section, equation, and page, thus allowing you to trace the C functions back to their source equations.
+Almost every statement in `lir.[ch]` module is commented. The comments cite LIR and ANS by chapter, section, equation, and page, thus allowing you to trace the C functions back to their source equations. And to aid tracing, I have used named the network parameters in accordance with the LIR notation.
 
 The procedure `run()` first loads from the `dat/` directory the CSV configuration file of the specified network, say `dat/xor2.csv`. This configuration file specifies the network architecture and training parameters:
 
