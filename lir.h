@@ -25,6 +25,10 @@ typedef struct Bp {
   double alpha; // momentum factor
   double epsilon; // error criterion
   double e; // current cycle's error
+  int C; // number of training cycles
+  int P; // number of data patterns
+  bool shuffle; // shuffle the input vectors
+  int* ord; // input presentation order
   int L; // number of layers
   int I; // number of input taps
   int* N; // number of nodes N[l]
@@ -38,9 +42,9 @@ typedef struct Bp {
   double*** dw; // augmented del-weight matrix dw[l][j][i]
 } Bp;
 
-extern Bp* newBp(const char* name, double eta, double alpha, double epsilon, int L, int I, const int* N, char** act);
+extern Bp* newBp(const char* name, double eta, double alpha, double epsilon, int C, int P, bool shuffle, int L, int I, const int* N, char** act);
 extern void delBp(Bp* bp);
-extern void learn(int C, int P, double** ii, double** tt, Bp* bp);
+extern void learn(double** ii, double** tt, Bp* bp);
 extern void recall(int P, double** ii, double** tt, Bp* bp);
 extern void dump(Bp* bp);
 

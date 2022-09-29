@@ -35,27 +35,25 @@ static void run(const char* name) {
   sprintf(buf, "%s/dat/%s.csv", cwd, name); // ~cwd/dat/"name".csv
   Csv* cfgcsv = newCsv(buf);
   loadCsv(cfgcsv);
-  int C, L, P, I, * N;
-  double eta, alpha, epsilon;
-  char** act;
   int f = 1; // CSV field; start at 1 to skip network name field
-  C = atoi(cfgcsv->r[1][f++]); // cfgcsv->r[1] holds data, r[0] holds header
-  L = atoi(cfgcsv->r[1][f++]);
-  eta = atof(cfgcsv->r[1][f++]);
-  alpha = atof(cfgcsv->r[1][f++]);
-  epsilon = atof(cfgcsv->r[1][f++]);
-  P = atoi(cfgcsv->r[1][f++]);
-  I = atoi(cfgcsv->r[1][f++]);
+  int C = atoi(cfgcsv->r[1][f++]); // cfgcsv->r[1] holds data, r[0] holds header
+  int L = atoi(cfgcsv->r[1][f++]);
+  int I = atoi(cfgcsv->r[1][f++]);
   // parse nodes per layer field formatted as "M|N..."
-  N = malloc(L * sizeof(int));
+  int* N = malloc(L * sizeof(int));
   strcpy(buf, cfgcsv->r[1][f++]);
   int l = 0;
   for (char* t, * s = buf; (t = strtok(s, "|\n\r")) != NULL; s = NULL) N[l++] = atoi(t);
   // parse activation function per layer field formatted as "f|g..."
   strcpy(buf, cfgcsv->r[1][f++]);
   l = 0;
-  act = malloc(L * sizeof(Act));
+  char** act = malloc(L * sizeof(Act));
   for (char* t, * s = buf; (t = strtok(s, "|\n\r")) != NULL; s = NULL) act[l++] = strdup(t); // malloc()
+  double eta = atof(cfgcsv->r[1][f++]);
+  double alpha = atof(cfgcsv->r[1][f++]);
+  double epsilon = atof(cfgcsv->r[1][f++]);
+  int P = atoi(cfgcsv->r[1][f++]);
+  bool shuffle = istrue(cfgcsv->r[1][f++]);
   delCsv(cfgcsv);
   cfgcsv = NULL;
   // load pattern vectors
@@ -64,8 +62,8 @@ static void run(const char* name) {
   sprintf(buf, "%s/dat/%s-t.csv", cwd, name);
   double** tt = load(P, buf);
   // train network
-  Bp* bp = newBp(name, eta, alpha, epsilon, L, I, N, act);
-  learn(C, P, ii, tt, bp);
+  Bp* bp = newBp(name, eta, alpha, epsilon, C, P, shuffle, L, I, N, act);
+  learn(ii, tt, bp);
   dump(bp);
   recall(P, ii, tt, bp);
   delBp(bp);

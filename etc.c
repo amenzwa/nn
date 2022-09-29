@@ -8,6 +8,10 @@
 #include <math.h>
 #include "etc.h"
 
+bool istrue(const char* s) {
+  return strcasecmp(s, "true") == 0;
+}
+
 bool iszero(double x) {
   /* The imprecision in the FPU hardware representation of real numbers,
    * it is impossible to check for exact zero equality like x == 0.0. */
@@ -21,6 +25,15 @@ double sqre(double x) {
 double randin(double lo, double hi) {
   /* Return a random double in the range [lo, hi]. */
   return lo + (double) random() / (double) RAND_MAX * (hi - lo);
+}
+
+void shuffle(int N, int* ord) {
+  for (int i = 0; i < N - 1; i++) {
+    int j = (int) (i + random() / (RAND_MAX / (N - i) + 1));
+    int t = ord[j];
+    ord[j] = ord[i];
+    ord[i] = t;
+  }
 }
 
 /* activation functions */

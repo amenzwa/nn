@@ -78,13 +78,13 @@ The procedure `run()` first loads from the `dat/` directory the CSV configuratio
 
 - `C`—number of training cycles
 - `L`—number of processing layers
-- `eta`—learning rate
+- `I`—number of input taps
+- `N`—number of nodes per processing layer, separated by `|`
+- `f`—layer-wide activation function (`...u` for unipolar, `...b` for bipolar)`eta`—learning rate
 - `alpha`—momentum factor
 - `epsilon`—RMS error criterion
 - `P`—number of data patterns
-- `I`—number of input taps
-- `N`—number of nodes per processing layer, separated by `|`
-- `f`—layer-wide activation function (`...u` for unipolar, `...b` for bipolar)
+- `shuffle`—shuffle pattern presentation order
 
 Using these parameters, `run()` creates a network, loads the input and target pattern vectors from `./dat/...-i.csv` and `./dat/...-t.csv`, and train the network. During training, the current RMS error is reported every few cycles. Upon completion of training, `run()` prints out the recall RMS error and the final weights. The input and target vectors are specified in their respective CSV files, one row per pattern.
 

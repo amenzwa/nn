@@ -11,7 +11,7 @@
 #include "etc.h"
 #include "lir.h"
 
-Bp* newBp(const char* name, double eta, double alpha, double epsilon, int nL, int nI, const int* nN, char** act) {
+Bp* newBp(const char* name, double eta, double alpha, double epsilon, int nC, int nP, bool shuffle, int nL, int nI, const int* nN, char** act) {
   /* Create a new network.
    * name: network name for use in report()
    * eta: learning rate
@@ -27,6 +27,11 @@ Bp* newBp(const char* name, double eta, double alpha, double epsilon, int nL, in
   bp->alpha = alpha;
   bp->epsilon = epsilon;
   bp->e = MAXFLOAT;
+  bp->C = nC;
+  bp->P = nP;
+  bp->shuffle = shuffle;
+  bp->ord = malloc(bp->P * sizeof(int));
+  for (int p = 0; p < bp->P; p++) bp->ord[p] = p;
   bp->L = nL;
   bp->I = nI;
   bp->N = malloc(bp->L * sizeof(int));
@@ -83,6 +88,7 @@ void delBp(Bp* bp) {
   free(bp->df);
   free(bp->f);
   free(bp->N);
+  free(bp->ord);
   free(bp->name);
   free(bp);
 }
@@ -130,33 +136,32 @@ static void backward(const double* p, Bp* bp) {
 }
 
 static void report(int c, Bp* bp) {
-  printf("c = %-6d  e = %-10.4g\n", c, bp->e);
+  printf("c = %-6d  e = %-10.4f\n", c, bp->e);
 }
 
-void learn(int C, int P, double** ii, double** tt, Bp* bp) {
+void learn(double** ii, double** tt, Bp* bp) {
   /* Train the network.
-   * C: number of training cycles
-   * P: number of data patterns
    * ii[]: input patterns
    * tt[]: associated target patterns (to calculate recall errors) */
   printf("learn %s\n", bp->name);
   const int lo = bp->L - 1;
-  for (int c = 0; bp->e > bp->epsilon && c < C; c++) {
+  for (int c = 0; bp->e > bp->epsilon && c < bp->C; c++) {
     // learn one cycle
+    if (bp->shuffle) shuffle(bp->P, bp->ord);
     bp->e = 0.0;
-    for (int p = 0; p < P; p++) {
-      forward(ii[p], bp);
-      backward(tt[p], bp);
+    for (int p = 0; p < bp->P; p++) {
+      forward(ii[bp->ord[p]], bp);
+      backward(tt[bp->ord[p]], bp);
       for (int j = 0; j < bp->N[lo]; j++) bp->e += sqre(bp->d[lo][j]); // sum of squares error; see LIR p 4
     }
-    bp->e = sqrt(bp->e) / bp->N[lo] / P; // root-mean-square error; see eq 4.35, ANS p 196
+    bp->e = sqrt(bp->e) / bp->N[lo] / bp->P; // root-mean-square error; see eq 4.35, ANS p 196
     // update weights at end of cycle
     for (int l = 0; l < bp->L; l++)
       for (int j = 0; j < bp->N[l]; j++) {
         const int I = l == 0 ? bp->I : bp->N[l - 1];
         for (int i = 0; i <= I; i++) bp->w[l][j][i] += bp->dw[l][j][i]; // (w) = (w) + (dw)
       }
-    if (bp->e < bp->epsilon || c % (C / 10) == 0) report(c, bp);
+    if (bp->e < bp->epsilon || c % (bp->C / 10) == 0) report(c, bp);
   }
 }
 
@@ -183,7 +188,7 @@ void dump(Bp* bp) {
     for (int j = 0; j < bp->N[l]; j++) {
       printf("  j = %d ", j);
       const int I = l == 0 ? bp->I : bp->N[l - 1];
-      for (int i = 0; i <= I; i++) printf("| %-10.4g ", bp->w[l][j][i]);
+      for (int i = 0; i <= I; i++) printf("| %+10.4f ", bp->w[l][j][i]);
       printf("|\n");
     }
   }

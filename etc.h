@@ -10,9 +10,11 @@
 
 typedef double (* Act)(double); // activation function
 
+extern bool istrue(const char* s);
 extern bool iszero(double x);
 extern double sqre(double x);
 extern double randin(double lo, double hi);
+extern void shuffle(int N, int* ord);
 
 extern double rampb(double x);
 extern double drampb(double);
