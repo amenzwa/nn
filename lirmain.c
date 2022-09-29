@@ -84,6 +84,9 @@ int main(int argc, const char** argv) {
     exit(1);
   }
   const int T = 10; // number of trials
-  for (int t = 0; t < T; t++) run(argv[1]);
+  for (int t = 0; t < T; t++) {
+    printf("\n---- t = %d ----\n", t);
+    run(argv[1]);
+  }
   return 0;
 }

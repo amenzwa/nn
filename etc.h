@@ -6,7 +6,7 @@
 
 #include <stdbool.h>
 
-#define WGT_RANGE 0.5  // weight initialization range
+#define WGT_RANGE 0.6  // weight initialization range; see LIR p 31
 
 typedef double (* Act)(double); // activation function
 

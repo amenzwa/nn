@@ -139,7 +139,7 @@ void learn(int C, int P, double** ii, double** tt, Bp* bp) {
    * P: number of data patterns
    * ii[]: input patterns
    * tt[]: associated target patterns (to calculate recall errors) */
-  printf("\nlearn %s\n", bp->name);
+  printf("learn %s\n", bp->name);
   const int lo = bp->L - 1;
   for (int c = 0; bp->e > bp->epsilon && c < C; c++) {
     // learn one cycle
