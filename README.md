@@ -53,8 +53,8 @@ The project is structured thus:
 
 ```pseudocode
 ~/nn/
-	Makefile        # build script
-	README.md       # this document
+  Makefile        # build script
+  README.md       # this document
   csv.[ch]        # CSV utility
   dat/            # CSV data directory
     lir-enc8*.csv # encoder problem from LIR
