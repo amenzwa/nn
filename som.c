@@ -81,7 +81,6 @@ void delSom(Som* som) {
 
 static Loc winner(const Vec* p, Som* som) {
   /* Select the winner node. */
-  // TODO: winner selection suspiciously favors the lower-left quadrant of the map - BUG!
   Loc n = {.x = -1, .y = -1}; // winner
   double min = MAXFLOAT;
   for (int y = 0; y < som->H; y++)
@@ -105,13 +104,13 @@ static Loc* hood(int S, Loc n, Som* som) {
    * See section II-B-D, SOM p 1467-1469 */
   Loc tl = (Loc) {.x = n.x - som->radius, .y = n.y - som->radius}; // top-left corner of the neighborhood
   for (int y = 0; y < S; y++)
-    for (int x = 0; x < S; x++) som->hood[toindex(som->radius, x, y)] = (Loc) {.x = tl.x + x, .y = tl.y + y};
+    for (int x = 0; x < S; x++) som->hood[toindex(S, x, y)] = (Loc) {.x = tl.x + x, .y = tl.y + y};
   return som->hood;
 }
 
 static inline void shrink(int c, Som* som) {
   /* Monotonically shrink neighborhood radius after the ordering phase. */
-  if (c >= ORDERING && som->radius > 1) som->radius--; // see section II-D, SOM p 1469
+  if (c >= ORDERING && som->radius > MIN_RADIUS) som->radius--; // see section II-D, SOM p 1469
 }
 
 static inline void slowdown(int C, int c, Som* som) {
@@ -154,7 +153,7 @@ void learn(Vec** ii, Som* som) {
   printf("learn %s\n", som->name);
   for (int c = 0; som->e > som->epsilon && c < som->C; c++) {
     if (som->shuffle) shuffle(som->P, som->ord);
-    if (som->radius > 0) shrink(c, som);
+    if (som->radius > MIN_RADIUS) shrink(c, som);
     slowdown(som->C, c, som);
     som->e = 0.0;
     for (int p = 0; p < som->P; p++) {
@@ -167,7 +166,7 @@ void learn(Vec** ii, Som* som) {
       Loc* hc = hood(S, nc, som);
       for (int y = 0; y < S; y++)
         for (int x = 0; x < S; x++) {
-          Loc n = hc[toindex(som->radius, x, y)];
+          Loc n = hc[toindex(S, x, y)];
           if (isinside(n, som)) update(v, n, alpha(nc, n, som), som);
         }
       som->e += foldVec(sumsqre, 0.0, som->i);
