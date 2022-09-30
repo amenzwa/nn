@@ -9,6 +9,7 @@
 
 #define ORDERING 1000 // number of cycles for early, ordering phase
 #define MIN_RADIUS 1 // minimum neighborhood radius
+#define END_ALPHA 0.1 // ending learning factor
 
 typedef struct Loc {
   int x, y; // node location on the map
@@ -18,7 +19,7 @@ typedef double (* Dist)(const Vec* u, const Vec* v);
 
 typedef struct Som {
   char* name; // network name
-  double alpha; // starting learning rate
+  double alpha; // starting learning factor
   double epsilon; // error criterion
   double e; // current cycle's error
   int C; // number of training cycles

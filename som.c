@@ -94,6 +94,10 @@ static Loc winner(const Vec* p, Som* som) {
   return n;
 }
 
+static inline bool isordering(int c) {
+  return c < ORDERING;
+}
+
 static inline int toindex(int w, int x, int y) {
   /* Convert (x, y) coordinate to 1D index. */
   return y * w + x;
@@ -110,20 +114,20 @@ static Loc* hood(int S, Loc n, Som* som) {
 
 static inline void shrink(int c, Som* som) {
   /* Monotonically shrink neighborhood radius after the ordering phase. */
-  if (c >= ORDERING && som->radius > MIN_RADIUS) som->radius--; // see section II-D, SOM p 1469
+  if (!isordering(c) && som->radius > MIN_RADIUS && c % (3 * ORDERING) == 0) som->radius--; // see section II-D, SOM p 1469
 }
 
 static inline void slowdown(int C, int c, Som* som) {
   /* Monotonically decrease alpha after the ordering phase. */
-  const double lim = 0.0001;
-  if (c >= ORDERING && som->alpha > lim) {
+  if (!isordering(c) && som->alpha > END_ALPHA) {
     som->alpha -= (double) c / (double) C; // see section II-D, SOM p 1469
-    if (som->alpha < lim) som->alpha = lim;
+    if (som->alpha < END_ALPHA) som->alpha = END_ALPHA;
   }
 }
 
-static double alpha(Loc nc, Loc n, Som* som) {
+static double alpha(int c, Loc nc, Loc n, Som* som) {
   /* Return the alpha for a node in the neighborhood. */
+  if (isordering(c)) return som->alpha;
   double d = (sqre(n.x - nc.x) + sqre(n.y - nc.y)) / sqre(som->radius); // scaled squared Euclidean distance
   return som->alpha * exp(-d); // see eq 8, section II-B, SOM p 1467
 }
@@ -167,7 +171,7 @@ void learn(Vec** ii, Som* som) {
       for (int y = 0; y < S; y++)
         for (int x = 0; x < S; x++) {
           Loc n = hc[toindex(S, x, y)];
-          if (isinside(n, som)) update(v, n, alpha(nc, n, som), som);
+          if (isinside(n, som)) update(v, n, alpha(c, nc, n, som), som);
         }
       som->e += foldVec(sumsqre, 0.0, som->i);
     }
