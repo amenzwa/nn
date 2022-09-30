@@ -136,7 +136,7 @@ static void backward(const double* p, Bp* bp) {
 }
 
 static void report(int c, Bp* bp) {
-  printf("c = %-6d  e = %-10.4f\n", c, bp->e);
+  printf("c = %-6d  e = %f\n", c, bp->e);
 }
 
 void learn(double** ii, double** tt, Bp* bp) {
