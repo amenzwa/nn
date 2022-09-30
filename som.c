@@ -108,7 +108,6 @@ static void update(const Vec* x, Node n, double a, Som* som) {
   subVVV(x, w, som->i); // [i] = [x] - [w]
   mulSVV(a, som->i, som->i); // [i] = alpha * [i]
   addVVV(w, som->i, w); // [w] = [w] + [i]; see eq 6, section II-B, SOM p 1467
-  som->e += foldVec(sumsqre, 0.0, som->i);
 }
 
 static bool isinside(Node n, Som* som) {
@@ -137,6 +136,7 @@ void learn(Vec** ii, Som* som) {
       const Node* h = hood(c, nc, som);
       for (int n = 0; n < som->arch; n++)
         if (isinside(h[n], som)) update(x, h[n], 0.5 * a, som); // use 0.5 alpha for neighbors
+      som->e += foldVec(sumsqre, 0.0, som->i);
     }
     som->e = sqrt(som->e) / (som->W + som->H) / som->P;
     if (som->e < som->epsilon || c % (som->C / 10) == 0) report(c, som);
