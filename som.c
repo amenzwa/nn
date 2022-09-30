@@ -83,7 +83,7 @@ static Node winner(const Vec* p, Som* som) {
 static const Node* hood(int /*c*/, Node n, Som* som) {
   /* Return n's neighborhood.
    * See section II-B-D, SOM p 1467-1469 */
-  const int radius = 1; // TODO start with W/2 and shrink incrementally down to 1 as c increases
+  const int radius = 1; // TODO start with radius of W/2 and shrink incrementally down to 1 after c has gone past ORDERING
   // neighborhood for r4
   som->hood[north] = (Node) {.x = n.x, .y = n.y - radius};
   som->hood[east] = (Node) {.x = n.x + radius, .y = n.y};

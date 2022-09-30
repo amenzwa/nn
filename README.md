@@ -1,19 +1,19 @@
 # nn
-## *a simple neural network implementation in C*
+## *a simple neural networks implementation in C*
 
-This is a simple implementation of [David Rumelhart](https://en.wikipedia.org/wiki/David_Rumelhart)'s back-propagation neural network algorithm. It is intended to show modern programmers the process of converting mathematics in scientific papers into prototype code. As such, the implementation here is a direct translation of the algorithmic proof given by Rumelhart in his seminal paper [*Learning Internal Representation by Error Propagation*](https://www.gwern.net/docs/ai/nn/1986-rumelhart.pdf) (LIR).
+This project contains simple implementations of two well-known neural network algorithms: [David Rumelhart](https://en.wikipedia.org/wiki/David_Rumelhart)'s back-propagation (BP) and [Teuvo Kohonen](https://en.wikipedia.org/wiki/Teuvo_Kohonen)'s self-organising map (SOM). The focus here is rather narrow. My goal is to show programmers how mathematics in scientific papers is transformed into prototype code. As such, the implementations are direct translations of the mathematical descriptions given by Rumelhart in his paper [*Learning Internal Representation by Error Propagation*](https://www.gwern.net/docs/ai/nn/1986-rumelhart.pdf) (LIR) and by Kohonen in his paper [*The Self-Organising Map*](https://sci2s.ugr.es/keel/pdf/algorithm/articulo/1990-Kohonen-PIEEE.pdf) (SOM).
 
-Do note that this project is a work-in-progress. Once it has matured somewhat, I will post a detailed article on reading peer-reviewed scientific papers, translating mathematics into prototype code, and the applicable system programming concepts on [my GitHub Pages blog](https://amenzwa.github.io). Please be patient. In the meantime, see my article [*How Artificial Intelligence Works*](https://amenzwa.github.io/stem/AI/HowAIWorks/) for a high-level background on neural networks in particular and AI in general.
+Do note that this project is a work in progress. Once it has matured somewhat, I will post a detailed article on interpreting peer-reviewed scientific papers, translating mathematics into prototype code, and system programming concepts on [my GitHub Pages blog](https://amenzwa.github.io). In the meantime, see my article [*How Artificial Intelligence Works*](https://amenzwa.github.io/stem/AI/HowAIWorks/) for a high-level overview and a historical background on neural networks in particular and AI in general.
 
-To learn the theory of back-propagation neural networks, read LIR in its entirety (about 30 pages). To understand the modern, vectorised implementation, read chapter 4 of ANS (about 70 pages) by [Jacek Zurada](https://en.wikipedia.org/wiki/Jacek_M._Zurada) in his classic textbook [*Introduction to Artificial Neural Systems*](https://www.amazon.com/Introduction-Artificial-Neural-Systems-Zurada/dp/053495460X) (ANS). Whereas LIR is written from psychology and neuroscience perspective, ANS is written from electrical engineering viewpoint.
+To learn the theory of back-propagation neural networks, read LIR (about 30 pages) and SOM (about 20 pages). To understand the modern, vectorised implementation, read chapter 4 (about 70 pages) and chapter 7 (about 60 pages) of [Jacek Zurada](https://en.wikipedia.org/wiki/Jacek_M._Zurada)'s classic textbook [*Introduction to Artificial Neural Systems*](https://www.amazon.com/Introduction-Artificial-Neural-Systems-Zurada/dp/053495460X) (ANS). LIR is written by a psychologist, SOM is written by a neuroscientist, and ANS is written by an electrical engineer. Studying these sources will give you a broad perspective on the subject.
 
-I would point out that young STEM students often under estimate the value of old publications, believing that old means irrelevant. If that were so, no one would hold Chaucer and Shakespeare in high esteem. There are three categories of textbooks in STEM: modern, classic, and vintage.
+There is a trend among young STEMers to under estimate the value of old publications, mistakenly believing that old means irrelevant. If that were so, no one would hold Chaucer and Shakespeare in high esteem. In STEM, there are three categories of textbooks: modern, classic, and vintage.
 
 Many modern texts strive to cover all the important, recent advances and applications, so their theoretical presentations necessary take a less prominent role. Modern texts are an excellent way to keep abreast with the latest developments in the field.
 
 Classic texts, especially those that were published just after the emergence of a groundbreaking idea, tend to be the best if one wishes to study that idea, in-depth. And given that they were published at the birth of an idea, their pages are not polluted with application examples and practice guides, so they are easier to read for novices interested in the underlying theory.
 
-But after half a century or so, all texts begin to show their age: their vintage examples become outdated and their vintage notations grate modern sensibilities. Still, there are many such vintage texts that are good-reads, much like Shakespeare still is. So, do not dismiss an old textbook based solely on its publication date inside the front cover.
+But after about a century, all texts begin to show their age: their vintage examples become outdated and their stale notations grate modern sensibilities. Still, there are many such vintage texts that are good-reads, much like Shakespeare still is. So, do not dismiss an old textbook based on its publication date imprinted inside the front cover.
 
 ## *about this project*
 
@@ -37,7 +37,7 @@ That is a whole lot of `for` loops. But it is an honest translation of Rumelhart
 
 But every implementation of back-propagation you will find on the Internet, be it a prototype or a production version, will use vector algebra. Indeed, the most popular deep learning framework, [TensorFlow](https://www.tensorflow.org/), is named so because it is implemented using [tensors](https://en.wikipedia.org/wiki/Tensor). Just as vectors are extensions of scalars and matrices are extensions of vectors, tensors are extensions of matrices from 2D to $n$D. To learn more about vectors and vector spaces, study chapters 7 and 8 of [Ken Riley](https://en.wikipedia.org/wiki/Ken_Riley_(physicist))'s excellent textbook [*Mathematical Methods for Physics and Engineering*](https://www.amazon.com/Mathematical-Methods-Physics-Engineering-Comprehensive/dp/0521679710).
 
-In vectorised version, the data pattern is the `p` vector, the weights of the layer `l` is the `w[l]` matrix, the output of the layer `l` is the `o[l]` vector, and so on. Matrix-based implementation is well-suited to modern GPUs, which are equipped with powerful matrix manipulation pipelines (because transformations in [3D computer graphics](https://en.wikipedia.org/wiki/Transformation_matrix#Examples_in_3D_computer_graphics) are implemented using matrices). The matrix-based implementation is also far more compact and is easier to understand. The loopy pseudocode above reduces to the following vectorised pseudocode:
+In vectorised version, like that described in ANS, the data pattern is the `p` vector, the weights of the layer `l` is the `w[l]` matrix, the output of the layer `l` is the `o[l]` vector, and so on. Matrix-based implementation is well-suited to modern GPUs, which are equipped with powerful matrix manipulation pipelines (because transformations in [3D computer graphics](https://en.wikipedia.org/wiki/Transformation_matrix#Examples_in_3D_computer_graphics) are implemented using matrices). The matrix-based implementation is also far more compact and is easier to understand. The loopy pseudocode above reduces to the following vectorised pseudocode:
 
 ```pseudocode
 for p in P
@@ -53,56 +53,89 @@ The project is structured thus:
 
 ```pseudocode
 ~/nn/
-  csv.[ch]
-  dat/
-    *.csv
-  lir.[ch]
-  lirmain.c
+	Makefile        # build script
+	README.md       # this document
+  csv.[ch]        # CSV utility
+  dat/            # CSV data directory
+    lir-enc8*.csv # encoder problem from LIR
+    lir-xor2*.csv # XOR problem from LIR
+    som-mst*.csv  # minimum spanning tree problem from SOM
+    som-rgb*.csv  # RGB colour classification problem
+  etc.[ch]        # network utilities
+  lir.[ch]        # LIR implementation
+  lirmain.c       # LIR main()
+  som.[ch]        # SOM implementation
+  sommain.c       # SOM main()
+  vec.[ch]        # vector algebra utilities
 ```
 
-The programme is written for Unix-like operating system. I do not work on Windows; neither should you. To compile and run `lir`, type in the following at a Unix command prompt:
+The programmes are written for Unix-like operating systems. I do not program on Windows; neither should you. To compile and run the programmes, type in the following at a Unix command prompt:
 
 ```shell
 $ cd ~/nn
 $ make clean all
 ...
-$ ./lir xor2
+$ ./lir lir-xor2
 ...
-$ ./lir enc8
+$ ./lir lir-enc8
+...
+$ ./som som-mst
+...
+$ ./som som-rgb
 ...
 ```
 
-Almost every statement in `lir.[ch]` module is commented. The comments cite LIR and ANS by chapter, section, equation, and page, thus allowing you to trace the C functions back to their source equations. And to aid tracing, I have used named the network parameters in accordance with the LIR notation.
+Almost every statement in `lir.[ch]` and `som.[ch]` modules is commented. The comments cite LIR, SOM, and ANS by chapter, section, equation, and page, thus allowing you to trace the C functions back to their source equations. And to aid tracing, I named the network parameters as close as practicable to the respective author's notation.
 
-The procedure `run()` first loads from the `dat/` directory the CSV configuration file of the specified network, say `dat/xor2.csv`. This configuration file specifies the network architecture and training parameters:
+The procedure `run()` in `*main.c` first loads from the `dat/` data directory the CSV configuration file of the specified network, say `dat/lir-xor2.csv`. This configuration file specifies the network architecture and the training parameters:
 
-- `C`—number of training cycles
-- `L`—number of processing layers
-- `I`—number of input taps
-- `N`—number of nodes per processing layer, separated by `|`
-- `f`—layer-wide activation function (`...u` for unipolar, `...b` for bipolar)`eta`—learning rate
-- `alpha`—momentum factor
-- `epsilon`—RMS error criterion
-- `P`—number of data patterns
-- `shuffle`—shuffle pattern presentation order
+- LIR:
+  - `name`—name of the network (also the base name of the CSV files)
+  - `C`—number of training cycles
+  - `L`—number of processing layers
+  - `I`—number of input taps
+  - `N`—number of nodes per processing layer, separated by `|`
+  - `f`—layer-wide activation function (`...u` for unipolar; `...b` for bipolar)
+  - `eta`—learning rate
+  - `alpha`—momentum factor
+  - `epsilon`—RMS error criterion
+  - `P`—number of data patterns
+  - `shuffle`—shuffle pattern presentation order
 
-Using these parameters, `run()` creates a network, loads the input and target pattern vectors from `./dat/...-i.csv` and `./dat/...-t.csv`, and train the network. During training, the current RMS error is reported every few cycles. Upon completion of training, `run()` prints out the recall RMS error and the final weights. The input and target vectors are specified in their respective CSV files, one row per pattern.
+- SOM:
+  - `name`—name of the network (also the base name of the CSV files)
+  - `C`—number of training cycles
+  - `I`—number of input taps
+  - `W`—number of nodes in the $x$ direction
+  - `H`—number of nodes in the $y$ direction
+  - `arch`—network architecture (`r4` for 4-neighbour rectangular; `r8` for 8-neighbour rectangular)
+  - `dist`—distance measure (`inner` for inner product; `euclidean` for Euclidean distance)
+  - `alpha`—learning factor
+  - `epsilon`—RMS error criterion
+  - `P`—number of data patterns
+  - `shuffle`—shuffle pattern presentation order
 
-The module `csv.[ch]` implements a simple CSV parser described in section 4.1 *Comma-Separated Values* of [*The Practice of Programming*](https://www.amazon.com/Practice-Programming-Addison-Wesley-Professional-Computing/dp/020161586X), Kernighan (1999).
+
+Using these parameters, `run()` creates a network, loads the pattern vectors, and train the network. During training, the current RMS error is reported every few cycles. Upon completion of training, `run()` prints out the final weights. The pattern vectors are specified in their respective CSV files, one row per pattern.
+
+The module `etc.[ch]` implements utilities common to both BP and SOM networks, such as the initial weights randomiser. This module also contains the various activation functions used by the BP network. Each activation function has a unipolar version and a bipolar version. The SOM network does not use activation functions; instead, it uses distance measures. The inner product (similarity cosine) measure is implemented by the `dotVVS()` function and the Euclidean distance measure is implemented by the `eucVVS()` function, which are defined in the `vec.[ch]` module. The module `vec.[ch]` implements vector and matrix manipulation utilities. Refer to chapter 7 *Vector Algebra* and chapter 8 *Matrices and Vector Spaces* of [*Mathematical Methods for Physics and Engineering*](https://www.amazon.com/Mathematical-Methods-Physics-Engineering-Comprehensive-ebook/dp/B00AKE1QJU), Riley (2006). The module `csv.[ch]` implements a simple CSV parser described in section 4.1 *Comma-Separated Values* of [*The Practice of Programming*](https://www.amazon.com/Practice-Programming-Addison-Wesley-Professional-Computing/dp/020161586X), Kernighan (1999).
 
 ## *experimenting on your own*
 
-If you want to experiment with your own network, create `yours.csv`, `yours-i.csv`, and `yours-t.csv` as described above, place the CSV files in the directory `./dat/`, and type `./lir yours` at the command prompt.
+If you want to experiment with your own BP network, create `lir-yours.csv`, `lir-yours-i.csv`, and `lir-yours-t.csv` as described above, place the CSV files in the directory `./dat/`, and type `./lir lir-yours` at the command prompt. For SOM network, use `som-yours.csv` and `som-yours-i.csv`. The `lir-` and `som-` prefixes are there only to keep the CSV files organised by network architecture.
 
-When creating your own data files, normalise the input and target vector components to the closed interval $[0.1, 0.9]$. As explained in LIR p. 9, the asymptotic nature of the sigmoid activation function prevents the network from ever reaching $0$ or $1$ saturated values. In compensation, we keep the values within this unsaturated range.
+When creating your own data files for BP networks, normalise the input and target vector components to the closed interval $[0.1, 0.9]$. As explained in LIR p. 9, the asymptotic nature of the sigmoid activation function prevents the network from ever reaching $0$ or $1$ saturated values. So, we keep the input values to BP within this unsaturated range. On the other hand, SOM networks can cope with raw, unnormalised data, even RGB bitmap images.
+
+Remember that both `lir` and `som` programmes in this project accepts only CSV-formatted UNIX text files. Given the minimal error checking in the code, non-CSV files, binary files, and Windows text files will likely crash the programmes.
 
 ## *a case for C*
 
-I chose the [C programming language](https://en.wikipedia.org/wiki/C_(programming_language)) for these reasons. C is a small, simple imperative language, so there is little or no abstractions to distract us from our main purpose. C is also very close to hardware; it is but a thin coat of syntactic sugar atop assembly, so it is the fastest high-level language. Direct access to hardware, speed, and simplicity are why C became the canonical system programming language over the decades. Exploiting C's strengths and coping with its many traps makes the programmer more mechanically sympathetic, a trait modern programmers have lost long ago. Those who use modern, GPU-based deep learning frameworks will benefit from knowing C. Lastly, this year 2022, is C's 50th anniversary, and I wish to honour this long-lived language that is still blazing trails, despite its age. It is remarkable that C has change very little over the past five decades. This stability is a testament to its original designer, [Dennis Ritchie](https://en.wikipedia.org/wiki/Dennis_Ritchie).
+I chose the [C programming language](https://en.wikipedia.org/wiki/C_(programming_language)) for these reasons. C is a small, simple imperative language, so there is little or no abstractions to distract us from our main purpose. C is also very close to hardware; it is but a thin coat of syntactic sugar atop assembly, so it is the fastest high-level language. Direct access to hardware, speed, and simplicity are why C became the canonical system programming language over the decades. Exploiting C's strengths and coping with its many traps makes the programmer more mechanically sympathetic, a trait modern programmers have lost long ago. Those who use modern, GPU-based deep learning frameworks will benefit from knowing C. Lastly, this year 2022, is C's 50th anniversary, and I wish to honour this long-lived language that is still blazing trails, despite its age. It is remarkable that C has change very little over the past five decades. This unrivalled stability is a testament to the far-reaching vision of its designer, [Dennis Ritchie](https://en.wikipedia.org/wiki/Dennis_Ritchie).
 
 ## *references*
 
 - [*Learning Internal Representations by Error Propagation*](https://www.gwern.net/docs/ai/nn/1986-rumelhart.pdf), Rumelhart (1986)
+- [*The Self-Organising Map*](https://sci2s.ugr.es/keel/pdf/algorithm/articulo/1990-Kohonen-PIEEE.pdf), Kohonen (1990)
 - [*Introduction to Artificial Neural Systems*](https://www.amazon.com/Introduction-Artificial-Neural-Systems-Zurada/dp/053495460X), Zurada (1992)
 - [*Mathematical Methods for Physics and Engineering*](https://www.amazon.com/Mathematical-Methods-Physics-Engineering-Comprehensive-ebook/dp/B00AKE1QJU), Riley (2006)
 - [*The Practice of Programming*](https://www.amazon.com/Practice-Programming-Addison-Wesley-Professional-Computing/dp/020161586X), Kernighan (1999)
