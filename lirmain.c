@@ -1,5 +1,5 @@
 /* Author: Amen Zwa, Esq.
- * Copyright 2022 sOnit, Inc.
+ * Copyright (c) 2022 sOnit, Inc.
  * References:
  * The XOR Problem: see LIR p 10
  * The Encoding Problem: see LIR p 14 */

@@ -3,7 +3,7 @@
 
 This is a simple implementation of [David Rumelhart](https://en.wikipedia.org/wiki/David_Rumelhart)'s back-propagation neural network algorithm. It is intended to show modern programmers the process of converting mathematics in scientific papers into prototype code. As such, the implementation here is a direct translation of the algorithmic proof given by Rumelhart in his seminal paper [*Learning Internal Representation by Error Propagation*](https://www.gwern.net/docs/ai/nn/1986-rumelhart.pdf) (LIR).
 
-Do note that this project is a work-in-progress. Once it has matured somewhat, I will post a detailed article on reading peer-reviewed scientific papers, translating mathematics into prototype code, and the applicable system programming concepts on [my GitHub Pages blog](https://amenzwa.github.io). Please be patient.
+Do note that this project is a work-in-progress. Once it has matured somewhat, I will post a detailed article on reading peer-reviewed scientific papers, translating mathematics into prototype code, and the applicable system programming concepts on [my GitHub Pages blog](https://amenzwa.github.io). Please be patient. In the meantime, see my article [*How Artificial Intelligence Works*](https://amenzwa.github.io/stem/AI/HowAIWorks/) for a high-level background on neural networks in particular and AI in general.
 
 To learn the theory of back-propagation neural networks, read LIR in its entirety (about 30 pages). To understand the modern, vectorised implementation, read chapter 4 of ANS (about 70 pages) by [Jacek Zurada](https://en.wikipedia.org/wiki/Jacek_M._Zurada) in his classic textbook [*Introduction to Artificial Neural Systems*](https://www.amazon.com/Introduction-Artificial-Neural-Systems-Zurada/dp/053495460X) (ANS). Whereas LIR is written from psychology and neuroscience perspective, ANS is written from electrical engineering viewpoint.
 
@@ -45,7 +45,7 @@ for p in P
     o[l] = f(w[l] * p)
 ```
 
-I will publish a matrix-based version of this project in the near future.
+Despite all the advantages of the matrix-based implementation, I chose to implement the LIR algorithm so as to show explicitly how the equations are realised in code. That is the main purpose of this project.
 
 ## *using the programme*
 

@@ -1,5 +1,5 @@
 /* Author: Amen Zwa, Esq.
- * Copyright 2022 sOnit, Inc.
+ * Copyright (c) 2022 sOnit, Inc.
  * References:
  * LIR: Learning Internal Representations by Error Propagation, Rumelhart (1986)
  * ANS: Introduction to Artificial Neural Systems, Zurada (1992) */

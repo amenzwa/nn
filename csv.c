@@ -1,5 +1,5 @@
 /* Author: Amen Zwa, Esq.
- * Copyright 2022 sOnit, Inc.
+ * Copyright (c) 2022 sOnit, Inc.
  * See section 4.1 Comma-Separated Values,
  * The Practice of Programming, Kernighan (1999) */
 

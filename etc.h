@@ -1,5 +1,5 @@
 /* Author: Amen Zwa, Esq.
- * Copyright 2022 sOnit, Inc. */
+ * Copyright (c) 2022 sOnit, Inc. */
 
 #ifndef NN_ETC_H
 #define NN_ETC_H
