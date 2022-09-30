@@ -28,15 +28,6 @@ static void toss(int P, Vec** pp) {
   free(pp);
 }
 
-static Arch arch(const char* a) {
-  if (strcmp(a, "r4") == 0) return r4;
-  else if (strcmp(a, "r8") == 0) return r8;
-  else {
-    fprintf(stderr, "ERROR: unknown architecture %s\n", a);
-    exit(1);
-  }
-}
-
 static Dist dist(const char* d) {
   if (strcmp(d, "inner") == 0) return dotVVS;
   else if (strcmp(d, "euclidean") == 0) return eucVVS;
@@ -59,7 +50,6 @@ static void run(const char* name) {
   int I = atoi(cfgcsv->r[1][f++]);
   int W = atoi(cfgcsv->r[1][f++]);
   int H = atoi(cfgcsv->r[1][f++]);
-  Arch a = arch(cfgcsv->r[1][f++]);
   Dist d = dist(cfgcsv->r[1][f++]);
   double alpha = atof(cfgcsv->r[1][f++]);
   double epsilon = atof(cfgcsv->r[1][f++]);
@@ -71,9 +61,10 @@ static void run(const char* name) {
   sprintf(buf, "%s/dat/%s-i.csv", cwd, name);
   Vec** ii = load(P, buf);
   // train network
-  Som* som = newSom(name, alpha, epsilon, C, P, shuffle, I, H, W, a, d);
+  Som* som = newSom(name, alpha, epsilon, C, P, shuffle, I, H, W, d);
   learn(ii, som);
   dump(som);
+  recall(ii, som);
   delSom(som);
   // terminate
   toss(P, ii);

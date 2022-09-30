@@ -26,27 +26,27 @@ void delVec(Vec* v) {
   free(v);
 }
 
-void cpyVec(const Vec* v, Vec* o) {
+inline void cpyVec(const Vec* v, Vec* o) {
   /* [o] = [v] (copy only v->C components) */
   memcpy(o->c, v->c, v->C * sizeof(double));
 }
 
-void addVVV(const Vec* u, const Vec* v, Vec* o) {
+inline void addVVV(const Vec* u, const Vec* v, Vec* o) {
   /* [o] = [u] + [v] */
   for (int c = 0; c < u->C; c++) o->c[c] = u->c[c] + v->c[c];
 }
 
-void subVVV(const Vec* u, const Vec* v, Vec* o) {
+inline void subVVV(const Vec* u, const Vec* v, Vec* o) {
   /* [o] = [u] - [v] */
   for (int c = 0; c < u->C; c++) o->c[c] = u->c[c] - v->c[c];
 }
 
-void mulSVV(double s, const Vec* v, Vec* o) {
+inline void mulSVV(double s, const Vec* v, Vec* o) {
   /* [o] = s * [v] */
   for (int c = 0; c < v->C; c++) o->c[c] = s * v->c[c];
 }
 
-void mulVVV(const Vec* u, const Vec* v, Vec* o) {
+inline void mulVVV(const Vec* u, const Vec* v, Vec* o) {
   /* [o] = [u] * [v] (multiply component wise) */
   for (int c = 0; c < u->C; c++) o->c[c] = u->c[c] * v->c[c];
 }
@@ -65,7 +65,7 @@ double eucVVS(const Vec* u, const Vec* v) {
   return sqrt(euc);
 }
 
-void mapVec(double (*f)(double), int C, const Vec* v, Vec* o) {
+inline void mapVec(double (*f)(double), int C, const Vec* v, Vec* o) {
   /* [o] = f [v] */
   for (int c = 0; c < C; c++) o->c[c] = f(v->c[c]);
 }
@@ -102,17 +102,17 @@ void trnMat(const Mat* m, Mat* o) {
     for (int c = 0; c < m->C; c++) o->r[c]->c[r] = m->r[r]->c[c];
 }
 
-void colVec(int c, const Mat* m, Vec* o) {
+inline void colVec(int c, const Mat* m, Vec* o) {
   /* [o] = m(*, c) */
   for (int r = 0; r < m->R; r++) o->c[r] = m->r[r]->c[c];
 }
 
-void addMMM(const Mat* m, const Mat* n, Mat* o) {
+inline void addMMM(const Mat* m, const Mat* n, Mat* o) {
   /* (o) = (m) + (n) */
   for (int r = 0; r < m->R; r++) addVVV(m->r[r], n->r[r], o->r[r]);
 }
 
-void mulSMM(double s, const Mat* m, Mat* o) {
+inline void mulSMM(double s, const Mat* m, Mat* o) {
   /* (o) = s * (m) */
   for (int r = 0; r < m->R; r++) mulSVV(s, m->r[r], o->r[r]);
 }
@@ -123,7 +123,7 @@ void mulVVM(const Vec* u, const Vec* v, Mat* o) {
     for (int c = 0; c < v->C; c++) o->r[r]->c[c] = u->c[r] * v->c[c];
 }
 
-void mulMVV(const Mat* m, const Vec* v, Vec* o) {
+inline void mulMVV(const Mat* m, const Vec* v, Vec* o) {
   /* [o] = (m) * [v] */
   for (int r = 0; r < v->C; r++) o->c[r] = dotVVS(m->r[r], v);
 }

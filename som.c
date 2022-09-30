@@ -10,7 +10,23 @@
 #include "etc.h"
 #include "som.h"
 
-Som* newSom(const char* name, double alpha, double epsilon, int C, int P, bool shuffle, int I, int H, int W, Arch arch, Dist dist) {
+static inline int side(Som* som) {
+  /* Return the side length of the neighborhood square based on the current shrink. */
+  return 1 + 2 * som->radius;
+}
+
+Som* newSom(const char* name, double alpha, double epsilon, int C, int P, bool shuffle, int I, int H, int W, Dist dist) {
+  /* Create a network.
+   * name: network name for use in report()
+   * alpha: learning factor
+   * epsilon: RMS error criterion
+   * C: number of training cycles
+   * P: number of pattern vectors
+   * shuffle: shuffle the presentation order
+   * I: number of input taps
+   * H: height of the map
+   * W: width of the map
+   * dist: distance measure */
   Som* som = malloc(1 * sizeof(Som));
   som->name = strdup(name); // malloc()
   som->alpha = alpha;
@@ -28,7 +44,9 @@ Som* newSom(const char* name, double alpha, double epsilon, int C, int P, bool s
   som->I = I;
   som->H = H;
   som->W = W;
-  som->arch = arch;
+  som->radius = som->W / 2; // see section II-D, SOM p 1469
+  const int S = side(som);
+  som->hood = malloc(S * S * sizeof(Loc)); // 1D array representing the 2D neighborhood square
   som->dist = dist;
   som->i = newVec(som->I);
   som->m = malloc(som->H * sizeof(Vec**));
@@ -46,6 +64,7 @@ Som* newSom(const char* name, double alpha, double epsilon, int C, int P, bool s
 }
 
 void delSom(Som* som) {
+  /* Destroy the network. */
   for (int y = 0; y < som->H; y++) {
     for (int x = 0; x < som->W; x++) delVec(som->m[y][x]);
     free(som->hits[y]);
@@ -54,68 +73,79 @@ void delSom(Som* som) {
   free(som->hits);
   free(som->m);
   delVec(som->i);
+  free(som->hood);
   free(som->ord);
   free(som->name);
   free(som);
 }
 
-static double alpha(int C, int c, Som* som) {
-  /* Monotinically decrease alpha after the ordering phase. */
-  if (c >= ORDERING) som->alpha -= (som->alpha - 0.1) / (double) (C - ORDERING); // see section II-D, SOM p 1469
-  return som->alpha;
-}
-
-static Node winner(const Vec* p, Som* som) {
+static Loc winner(const Vec* p, Som* som) {
   /* Select the winner node. */
-  Node n = {.x = -1, .y = -1}; // winner
+  // TODO: winner selection suspiciously favors the lower-left quadrant of the map - BUG!
+  Loc n = {.x = -1, .y = -1}; // winner
   double min = MAXFLOAT;
   for (int y = 0; y < som->H; y++)
     for (int x = 0; x < som->W; x++) {
       double d = som->dist(p, som->m[y][x]);
       if (d < min) { // see eq 2', section II-B, SOM p 1467
-        n = (Node) {.x = x, .y = y};
+        n = (Loc) {.x = x, .y = y};
         min = d;
       }
     }
   return n;
 }
 
-static const Node* hood(int /*c*/, Node n, Som* som) {
-  /* Return n's neighborhood.
+static inline int toindex(int w, int x, int y) {
+  /* Convert (x, y) coordinate to 1D index. */
+  return y * w + x;
+}
+
+static Loc* hood(int S, Loc n, Som* som) {
+  /* Construct node n's neighborhood based on the current shrink.
    * See section II-B-D, SOM p 1467-1469 */
-  const int radius = 1; // TODO start with radius of W/2 and shrink incrementally down to 1 after c has gone past ORDERING
-  // neighborhood for r4
-  som->hood[north] = (Node) {.x = n.x, .y = n.y - radius};
-  som->hood[east] = (Node) {.x = n.x + radius, .y = n.y};
-  som->hood[south] = (Node) {.x = n.x, .y = n.y + radius};
-  som->hood[west] = (Node) {.x = n.x - radius, .y = n.y};
-  // neighborhood for r8
-  if (som->arch == r8) {
-    som->hood[northeast] = (Node) {.x = n.x + radius, .y = n.y - radius};
-    som->hood[southeast] = (Node) {.x = n.x + radius, .y = n.y + radius};
-    som->hood[southwest] = (Node) {.x = n.x - radius, .y = n.y + radius};
-    som->hood[northwest] = (Node) {.x = n.x - radius, .y = n.y - radius};
-  }
+  Loc tl = (Loc) {.x = n.x - som->radius, .y = n.y - som->radius}; // top-left corner of the neighborhood
+  for (int y = 0; y < S; y++)
+    for (int x = 0; x < S; x++) som->hood[toindex(som->radius, x, y)] = (Loc) {.x = tl.x + x, .y = tl.y + y};
   return som->hood;
 }
 
-static double sumsqre(double a, double c) {
-  return a + sqre(c);
+static inline void shrink(int c, Som* som) {
+  /* Monotonically shrink neighborhood radius after the ordering phase. */
+  if (c >= ORDERING && som->radius > 1) som->radius--; // see section II-D, SOM p 1469
 }
 
-static void update(const Vec* x, Node n, double a, Som* som) {
+static inline void slowdown(int C, int c, Som* som) {
+  /* Monotonically decrease alpha after the ordering phase. */
+  const double lim = 0.0001;
+  if (c >= ORDERING && som->alpha > lim) {
+    som->alpha -= (double) c / (double) C; // see section II-D, SOM p 1469
+    if (som->alpha < lim) som->alpha = lim;
+  }
+}
+
+static double alpha(Loc nc, Loc n, Som* som) {
+  /* Return the alpha for a node in the neighborhood. */
+  double d = (sqre(n.x - nc.x) + sqre(n.y - nc.y)) / sqre(som->radius); // scaled squared Euclidean distance
+  return som->alpha * exp(-d); // see eq 8, section II-B, SOM p 1467
+}
+
+static void update(const Vec* x, Loc n, double a, Som* som) {
   Vec* w = som->m[n.y][n.x]; // [w] = [m]_winner
   subVVV(x, w, som->i); // [i] = [x] - [w]
   mulSVV(a, som->i, som->i); // [i] = alpha * [i]
   addVVV(w, som->i, w); // [w] = [w] + [i]; see eq 6, section II-B, SOM p 1467
 }
 
-static bool isinside(Node n, Som* som) {
+static inline bool isinside(Loc n, Som* som) {
   return 0 <= n.y && n.y < som->H && 0 <= n.x && n.x < som->W;
 }
 
-static void report(int c, Som* som) {
-  printf("c = %-6d  e = %f\n", c, som->e);
+static inline double sumsqre(double a, double c) {
+  return a + sqre(c);
+}
+
+static inline void report(int c, Som* som) {
+  printf("c = %-6d  e = %-10.8f\n", c, som->e);
 }
 
 void learn(Vec** ii, Som* som) {
@@ -124,18 +154,22 @@ void learn(Vec** ii, Som* som) {
   printf("learn %s\n", som->name);
   for (int c = 0; som->e > som->epsilon && c < som->C; c++) {
     if (som->shuffle) shuffle(som->P, som->ord);
+    if (som->radius > 0) shrink(c, som);
+    slowdown(som->C, c, som);
     som->e = 0.0;
     for (int p = 0; p < som->P; p++) {
       // select the winner
-      const Vec* x = ii[som->ord[p]];
-      Node nc = winner(x, som);
-      som->hits[nc.y][nc.x]++; // update hit count
+      const Vec* v = ii[som->ord[p]];
+      Loc nc = winner(v, som);
+      som->hits[nc.y][nc.x]++; // update winner's hits
       // update weights of winner and its neighborhood
-      const double a = alpha(som->C, c, som);
-      update(x, nc, a, som);
-      const Node* h = hood(c, nc, som);
-      for (int n = 0; n < som->arch; n++)
-        if (isinside(h[n], som)) update(x, h[n], 0.5 * a, som); // use 0.5 alpha for neighbors
+      const int S = side(som);
+      Loc* hc = hood(S, nc, som);
+      for (int y = 0; y < S; y++)
+        for (int x = 0; x < S; x++) {
+          Loc n = hc[toindex(som->radius, x, y)];
+          if (isinside(n, som)) update(v, n, alpha(nc, n, som), som);
+        }
       som->e += foldVec(sumsqre, 0.0, som->i);
     }
     som->e = sqrt(som->e) / (som->W + som->H) / som->P;
@@ -143,10 +177,29 @@ void learn(Vec** ii, Som* som) {
   }
 }
 
+void recall(Vec** ii, Som* som) {
+  /* Test the network.
+   * ii[]: input patterns */
+  printf("recall %s\n", som->name);
+  som->e = 0.0;
+  for (int p = 0; p < som->P; p++) {
+    // select the winner
+    const Vec* v = ii[p];
+    Loc nc = winner(v, som);
+    printf("p = ");
+    for (int i = 0; i < v->C; i++) printf("| %+10.4f ", v->c[i]);
+    printf("| -> (%d, %d)\n", nc.x, nc.y);
+    som->e += foldVec(sumsqre, 0.0, som->i);
+  }
+  som->e = sqrt(som->e) / (som->W + som->H) / som->P;
+  report(-1, som);
+}
+
 void dump(Som* som) {
   printf("dump %s (%d x %d)\n", som->name, som->W, som->H);
   for (int y = 0; y < som->H; y++) {
-    for (int x = 0; x < som->W; x++) printf(" %8d", som->hits[y][x]);
+    printf("  y = %d  ", y);
+    for (int x = 0; x < som->W; x++) printf("| %8d ", som->hits[y][x]);
     printf("\n");
   }
 }

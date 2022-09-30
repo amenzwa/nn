@@ -1,2 +1,2 @@
 name,C,L,I,N,f,eta,alpha,epsilon,P,shuffle
-enc8,10000,2,8,3|8,logisticu|logisticu,0.05,0.9,0.003,8,TRUE
+enc8,10000,2,8,3|8,logisticu|logisticu,0.05,0.9,0.001,8,TRUE

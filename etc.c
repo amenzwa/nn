@@ -8,21 +8,21 @@
 #include <math.h>
 #include "etc.h"
 
-bool istrue(const char* s) {
+inline bool istrue(const char* s) {
   return strcasecmp(s, "true") == 0;
 }
 
-bool iszero(double x) {
+inline bool iszero(double x) {
   /* The imprecision in the FPU hardware representation of real numbers,
    * it is impossible to check for exact zero equality like x == 0.0. */
   return fabs(x) <= 10e-12;
 }
 
-double sqre(double x) {
+inline double sqre(double x) {
   return x * x;
 }
 
-double randin(double lo, double hi) {
+inline double randin(double lo, double hi) {
   /* Return a random double in the range [lo, hi]. */
   return lo + (double) random() / (double) RAND_MAX * (hi - lo);
 }
@@ -38,51 +38,51 @@ void shuffle(int N, int* ord) {
 
 /* activation functions */
 
-double rampb(double x) {
+inline double rampb(double x) {
   return x;
 }
 
-double drampb(double /*x*/) {
+inline double drampb(double /*x*/) {
   return 1.0;
 }
 
-double rampu(double x) {
+inline double rampu(double x) {
   return x < 0.0 ? 0.01 : (x > 0.0 ? x : 0.0);
 }
 
-double drampu(double x) {
+inline double drampu(double x) {
   return x < 0.0 ? 0.01 : (x > 0.0 ? 0.99 : 0.0);
 }
 
-double logisticb(double x) {
+inline double logisticb(double x) {
   return 2.0 / (1.0 + exp(-x)) - 1.0; // bipolar logistic activation function; see ANS p 180
 }
 
-double dlogisticb(double x) {
+inline double dlogisticb(double x) {
   return 0.5 * (1.0 - sqre(x)); // derivative of bipolar logistic activation function; see eq 4.18b, ANS p 179
 }
 
-double logisticu(double x) {
+inline double logisticu(double x) {
   return 1.0 / (1.0 + exp(-x)); // unipolar logistic activation function; see eq 15, LIR p 9
 }
 
-double dlogisticu(double x) {
+inline double dlogisticu(double x) {
   return x - sqre(x); // derivative of unipolar logistic activation function; see LIR p 9
 }
 
-double stepb(double x) {
+inline double stepb(double x) {
   return x < 0.0 ? -0.99 : (x > 0.0 ? 0.99 : 0.0);
 }
 
-double dstepb(double x) {
+inline double dstepb(double x) {
   return iszero(x) ? 1.99 : 0.01;
 }
 
-double stepu(double x) {
+inline double stepu(double x) {
   return x < 0.0 ? 0.01 : (x > 0.0 ? 0.99 : 0.0);
 }
 
-double dstepu(double x) {
+inline double dstepu(double x) {
   return iszero(x) ? 0.99 : 0.01;
 }
 
