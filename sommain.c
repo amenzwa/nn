@@ -85,7 +85,7 @@ int main(int argc, const char** argv) {
     fprintf(stderr, "Usage: %s netname\n", argv[0]);
     exit(1);
   }
-  const int T = 1; // number of trials
+  const int T = 3; // number of trials
   for (int t = 0; t < T; t++) {
     printf("\n---- t = %d ----\n", t);
     run(argv[1]);

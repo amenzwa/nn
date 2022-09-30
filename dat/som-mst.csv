@@ -1,2 +1,2 @@
 name,C,I,W,H,arch,dist,alpha,epsilon,P,shuffle
-mst,100000,5,10,7,r8,euclidean,0.9,0.0005,32,TRUE
+mst,100000,5,10,7,r8,euclidean,0.9,0.001,32,TRUE
