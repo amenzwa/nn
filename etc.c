@@ -42,16 +42,16 @@ double rampb(double x) {
   return x;
 }
 
-double drampb(double) {
+double drampb(double /*x*/) {
   return 1.0;
 }
 
 double rampu(double x) {
-  return x < 0.0 ? 0.01 : x;
+  return x < 0.0 ? 0.01 : (x > 0.0 ? x : 0.0);
 }
 
 double drampu(double x) {
-  return x < 0.0 ? 0.01 : 0.99;
+  return x < 0.0 ? 0.01 : (x > 0.0 ? 0.99 : 0.0);
 }
 
 double logisticb(double x) {
@@ -71,7 +71,7 @@ double dlogisticu(double x) {
 }
 
 double stepb(double x) {
-  return x < 0.0 ? -0.99 : 0.99;
+  return x < 0.0 ? -0.99 : (x > 0.0 ? 0.99 : 0.0);
 }
 
 double dstepb(double x) {
@@ -79,7 +79,7 @@ double dstepb(double x) {
 }
 
 double stepu(double x) {
-  return x < 0.0 ? 0.01 : 0.99;
+  return x < 0.0 ? 0.01 : (x > 0.0 ? 0.99 : 0.0);
 }
 
 double dstepu(double x) {
