@@ -19,7 +19,7 @@ typedef double (* Dist)(const Vec* u, const Vec* v);
 
 typedef struct Som {
   char* name; // network name
-  double alpha; // starting learning factor
+  double alpha; // beginning learning factor
   double epsilon; // error criterion
   double e; // current cycle's error
   int C; // number of training cycles
@@ -28,7 +28,7 @@ typedef struct Som {
   int* ord; // input presentation order
   int I; // input vector length
   int H, W; // network dimensions
-  int radius; // neighborhood shrink
+  int radius; // beginning neighborhood radius
   Loc* hood; // neighborhood around the winner
   Dist dist; // distance measure
   Vec* i; // temporary store for alpha * [x]

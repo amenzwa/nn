@@ -11,6 +11,25 @@
 #include "etc.h"
 #include "lir.h"
 
+void dump(Bp* bp) {
+  printf("dump %s weights\n", bp->name);
+  for (int l = 0; l < bp->L; l++) {
+    printf("l = %d\n", l);
+    for (int j = 0; j < bp->N[l]; j++) {
+      printf("  j = %d ", j);
+      const int I = l == 0 ? bp->I : bp->N[l - 1];
+      for (int i = 0; i <= I; i++) printf("| %+10.4f ", bp->w[l][j][i]);
+      printf("|\n");
+    }
+  }
+}
+
+static inline void report(int c, Bp* bp) {
+  printf("c = %-6d  e = %-10.8f\n", c, bp->e);
+}
+
+/* back-propagation */
+
 Bp* newBp(const char* name, double eta, double alpha, double epsilon, int nC, int nP, bool shuffle, int nL, int nI, const int* nN, char** act) {
   /* Create a network.
    * name: network name for use in report()
@@ -138,10 +157,6 @@ static void backward(const double* p, Bp* bp) {
   }
 }
 
-static inline void report(int c, Bp* bp) {
-  printf("c = %-6d  e = %-10.8f\n", c, bp->e);
-}
-
 void learn(double** ii, double** tt, Bp* bp) {
   /* Train the network.
    * ii[]: input patterns
@@ -182,17 +197,4 @@ void recall(int P, double** ii, double** tt, Bp* bp) {
   }
   bp->e = sqrt(bp->e) / bp->N[lo] / P;
   report(-1, bp);
-}
-
-void dump(Bp* bp) {
-  printf("dump %s weights\n", bp->name);
-  for (int l = 0; l < bp->L; l++) {
-    printf("l = %d\n", l);
-    for (int j = 0; j < bp->N[l]; j++) {
-      printf("  j = %d ", j);
-      const int I = l == 0 ? bp->I : bp->N[l - 1];
-      for (int i = 0; i <= I; i++) printf("| %+10.4f ", bp->w[l][j][i]);
-      printf("|\n");
-    }
-  }
 }

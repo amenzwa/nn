@@ -10,10 +10,64 @@
 #include "etc.h"
 #include "som.h"
 
-static inline int side(Som* som) {
-  /* Return the side length of the neighborhood square based on the current shrink. */
-  return 1 + 2 * som->radius;
+static inline bool isinside(Loc n, Som* som) {
+  return 0 <= n.y && n.y < som->H && 0 <= n.x && n.x < som->W;
 }
+
+static inline bool isordering(int c) {
+  /* Check if the learning process is still in the ordering phase. */
+  return c < ORDERING; // see section II-D, SOM p 1469
+}
+
+static inline int toindex(int w, int x, int y) {
+  /* Convert (x, y) coordinate to 1D index. */
+  return y * w + x;
+}
+
+static inline int radius(int c, Som* som) {
+  /* Monotonically shrink neighborhood radius after the ordering phase. */
+  if (isordering(c)) return som->radius;
+  const int r = (int) (som->radius * exp(-(double) c / som->C)); // see section II-D, SOM p 1469
+  return r <= MIN_RADIUS ? MIN_RADIUS : r;
+}
+
+static inline int side(int c, Som* som) {
+  /* Return the side length of the neighborhood square based on the current shrink. */
+  return 1 + 2 * radius(c, som);
+}
+
+static Loc* hood(int c, int S, Loc n, Som* som) {
+  /* Construct node n's neighborhood based on the current radius.
+   * See section II-B-D, SOM p 1467-1469 */
+  const int r = radius(c, som);
+  Loc tl = (Loc) {.x = n.x - r, .y = n.y - r}; // top-left corner of the neighborhood
+  for (int y = 0; y < S; y++)
+    for (int x = 0; x < S; x++) som->hood[toindex(S, x, y)] = (Loc) {.x = tl.x + x, .y = tl.y + y};
+  return som->hood;
+}
+
+static double alpha(int c, Loc nc, Loc n, Som* som) {
+  /* Monotonically decrease alpha after the ordering phase, and return the alpha for a node in the neighborhood. */
+  if (isordering(c)) return som->alpha;
+  const double d = (sqre(n.x - nc.x) + sqre(n.y - nc.y)) / sqre(radius(c, som)); // scaled squared Euclidean distance
+  const double a = som->alpha * exp(-d - (double) c / som->C); // see eq 8, section II-B, SOM p 1467
+  return a <= END_ALPHA ? END_ALPHA : a;
+}
+
+void dump(Som* som) {
+  printf("dump %s (%d x %d)\n", som->name, som->W, som->H);
+  for (int y = 0; y < som->H; y++) {
+    printf("  y = %d  ", y);
+    for (int x = 0; x < som->W; x++) printf("| %8d ", som->hits[y][x]);
+    printf("\n");
+  }
+}
+
+static inline void report(int c, Som* som) {
+  printf("c = %-6d  e = %-10.8f\n", c, som->e);
+}
+
+/* self-organizing map */
 
 Som* newSom(const char* name, double alpha, double epsilon, int C, int P, bool shuffle, int I, int H, int W, Dist dist) {
   /* Create a network.
@@ -45,7 +99,7 @@ Som* newSom(const char* name, double alpha, double epsilon, int C, int P, bool s
   som->H = H;
   som->W = W;
   som->radius = som->W / 2; // see section II-D, SOM p 1469
-  const int S = side(som);
+  const int S = side(0, som);
   som->hood = malloc(S * S * sizeof(Loc)); // 1D array representing the 2D neighborhood square
   som->dist = dist;
   som->i = newVec(som->I);
@@ -94,61 +148,12 @@ static Loc winner(const Vec* p, Som* som) {
   return n;
 }
 
-static inline bool isordering(int c) {
-  return c < ORDERING;
-}
-
-static inline int toindex(int w, int x, int y) {
-  /* Convert (x, y) coordinate to 1D index. */
-  return y * w + x;
-}
-
-static Loc* hood(int S, Loc n, Som* som) {
-  /* Construct node n's neighborhood based on the current shrink.
-   * See section II-B-D, SOM p 1467-1469 */
-  Loc tl = (Loc) {.x = n.x - som->radius, .y = n.y - som->radius}; // top-left corner of the neighborhood
-  for (int y = 0; y < S; y++)
-    for (int x = 0; x < S; x++) som->hood[toindex(S, x, y)] = (Loc) {.x = tl.x + x, .y = tl.y + y};
-  return som->hood;
-}
-
-static inline void shrink(int c, Som* som) {
-  /* Monotonically shrink neighborhood radius after the ordering phase. */
-  if (!isordering(c) && som->radius > MIN_RADIUS && c % (3 * ORDERING) == 0) som->radius--; // see section II-D, SOM p 1469
-}
-
-static inline void slowdown(int C, int c, Som* som) {
-  /* Monotonically decrease alpha after the ordering phase. */
-  if (!isordering(c) && som->alpha > END_ALPHA) {
-    som->alpha -= (double) c / (double) C; // see section II-D, SOM p 1469
-    if (som->alpha < END_ALPHA) som->alpha = END_ALPHA;
-  }
-}
-
-static double alpha(int c, Loc nc, Loc n, Som* som) {
-  /* Return the alpha for a node in the neighborhood. */
-  if (isordering(c)) return som->alpha;
-  double d = (sqre(n.x - nc.x) + sqre(n.y - nc.y)) / sqre(som->radius); // scaled squared Euclidean distance
-  return som->alpha * exp(-d); // see eq 8, section II-B, SOM p 1467
-}
-
 static void update(const Vec* x, Loc n, double a, Som* som) {
+  /* Update the weights of the winner and its neighborhood. */
   Vec* w = som->m[n.y][n.x]; // [w] = [m]_winner
   subVVV(x, w, som->i); // [i] = [x] - [w]
   mulSVV(a, som->i, som->i); // [i] = alpha * [i]
   addVVV(w, som->i, w); // [w] = [w] + [i]; see eq 6, section II-B, SOM p 1467
-}
-
-static inline bool isinside(Loc n, Som* som) {
-  return 0 <= n.y && n.y < som->H && 0 <= n.x && n.x < som->W;
-}
-
-static inline double sumsqre(double a, double c) {
-  return a + sqre(c);
-}
-
-static inline void report(int c, Som* som) {
-  printf("c = %-6d  e = %-10.8f\n", c, som->e);
 }
 
 void learn(Vec** ii, Som* som) {
@@ -156,18 +161,16 @@ void learn(Vec** ii, Som* som) {
    * ii[]: input patterns */
   printf("learn %s\n", som->name);
   for (int c = 0; som->e > som->epsilon && c < som->C; c++) {
-    if (som->shuffle) shuffle(som->P, som->ord);
-    if (som->radius > MIN_RADIUS) shrink(c, som);
-    slowdown(som->C, c, som);
     som->e = 0.0;
+    if (som->shuffle) shuffle(som->P, som->ord);
     for (int p = 0; p < som->P; p++) {
       // select the winner
       const Vec* v = ii[som->ord[p]];
       Loc nc = winner(v, som);
       som->hits[nc.y][nc.x]++; // update winner's hits
       // update weights of winner and its neighborhood
-      const int S = side(som);
-      Loc* hc = hood(S, nc, som);
+      const int S = side(c, som);
+      Loc* hc = hood(c, S, nc, som);
       for (int y = 0; y < S; y++)
         for (int x = 0; x < S; x++) {
           Loc n = hc[toindex(S, x, y)];
@@ -196,13 +199,4 @@ void recall(Vec** ii, Som* som) {
   }
   som->e = sqrt(som->e) / (som->W + som->H) / som->P;
   report(-1, som);
-}
-
-void dump(Som* som) {
-  printf("dump %s (%d x %d)\n", som->name, som->W, som->H);
-  for (int y = 0; y < som->H; y++) {
-    printf("  y = %d  ", y);
-    for (int x = 0; x < som->W; x++) printf("| %8d ", som->hits[y][x]);
-    printf("\n");
-  }
 }

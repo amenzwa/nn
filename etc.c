@@ -8,18 +8,22 @@
 #include <math.h>
 #include "etc.h"
 
-inline bool istrue(const char* s) {
-  return strcasecmp(s, "true") == 0;
-}
-
 inline bool iszero(double x) {
   /* The imprecision in the FPU hardware representation of real numbers,
    * it is impossible to check for exact zero equality like x == 0.0. */
   return fabs(x) <= 10e-12;
 }
 
+inline bool istrue(const char* s) {
+  return strcasecmp(s, "true") == 0;
+}
+
 inline double sqre(double x) {
   return x * x;
+}
+
+inline double sumsqre(double a, double c) {
+  return a + sqre(c);
 }
 
 inline double randin(double lo, double hi) {
