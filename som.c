@@ -11,6 +11,7 @@
 #include "som.h"
 
 static inline bool isinside(Loc n, Som* som) {
+  /* Check if node n is inside the map. */
   return 0 <= n.y && n.y < som->H && 0 <= n.x && n.x < som->W;
 }
 
@@ -55,7 +56,8 @@ static double alpha(int c, Loc nc, Loc n, Som* som) {
 }
 
 void dump(Som* som) {
-  printf("dump %s (%d x %d)\n", som->name, som->W, som->H);
+  /* Dump the current hits. */
+  printf("dump %s (%d x %d) hits\n", som->name, som->W, som->H);
   for (int y = 0; y < som->H; y++) {
     printf("  y = %d  ", y);
     for (int x = 0; x < som->W; x++) printf("| %8d ", som->hits[y][x]);
@@ -64,7 +66,8 @@ void dump(Som* som) {
 }
 
 static inline void report(int c, Som* som) {
-  printf("c = %-6d  e = %-10.8f\n", c, som->e);
+  /* Report the current training cycle and current training error. */
+  printf("c = %-10d  e = %-10.8f\n", c, som->e);
 }
 
 /* self-organizing map */
@@ -134,7 +137,7 @@ void delSom(Som* som) {
 }
 
 static Loc winner(const Vec* p, Som* som) {
-  /* Select the winner node. */
+  /* Select the winner. */
   Loc n = {.x = -1, .y = -1}; // winner
   double min = MAXFLOAT;
   for (int y = 0; y < som->H; y++)
@@ -178,6 +181,7 @@ void learn(Vec** ii, Som* som) {
         }
       som->e += foldVec(sumsqre, 0.0, som->i);
     }
+    // report training error
     som->e = sqrt(som->e) / (som->W + som->H) / som->P;
     if (som->e < som->epsilon || c % (som->C / 10) == 0) report(c, som);
   }
@@ -192,11 +196,13 @@ void recall(Vec** ii, Som* som) {
     // select the winner
     const Vec* v = ii[p];
     Loc nc = winner(v, som);
-    printf("p = ");
+    som->e += foldVec(sumsqre, 0.0, som->i);
+    // show pattern-winner association
+    printf("p = %-10d ", p);
     for (int i = 0; i < v->C; i++) printf("| %+10.4f ", v->c[i]);
     printf("| -> (%d, %d)\n", nc.x, nc.y);
-    som->e += foldVec(sumsqre, 0.0, som->i);
   }
+  // report recall error
   som->e = sqrt(som->e) / (som->W + som->H) / som->P;
   report(-1, som);
 }

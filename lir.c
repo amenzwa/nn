@@ -11,26 +11,28 @@
 #include "etc.h"
 #include "lir.h"
 
-void dump(Bp* bp) {
-  printf("dump %s weights\n", bp->name);
-  for (int l = 0; l < bp->L; l++) {
+void dump(Ebp* ebp) {
+  /* Dump the current weights. */
+  printf("dump %s weights\n", ebp->name);
+  for (int l = 0; l < ebp->L; l++) {
     printf("l = %d\n", l);
-    for (int j = 0; j < bp->N[l]; j++) {
+    for (int j = 0; j < ebp->N[l]; j++) {
       printf("  j = %d ", j);
-      const int I = l == 0 ? bp->I : bp->N[l - 1];
-      for (int i = 0; i <= I; i++) printf("| %+10.4f ", bp->w[l][j][i]);
+      const int I = l == 0 ? ebp->I : ebp->N[l - 1];
+      for (int i = 0; i <= I; i++) printf("| %+10.4f ", ebp->w[l][j][i]);
       printf("|\n");
     }
   }
 }
 
-static inline void report(int c, Bp* bp) {
-  printf("c = %-6d  e = %-10.8f\n", c, bp->e);
+static inline void report(int c, Ebp* ebp) {
+  /* Report the current training cycle and current training error. */
+  printf("c = %-10d  e = %-10.8f\n", c, ebp->e);
 }
 
 /* back-propagation */
 
-Bp* newBp(const char* name, double eta, double alpha, double epsilon, int nC, int nP, bool shuffle, int nL, int nI, const int* nN, char** act) {
+Ebp* newBp(const char* name, double eta, double alpha, double epsilon, int nC, int nP, bool shuffle, int nL, int nI, const int* nN, char** act) {
   /* Create a network.
    * name: network name for use in report()
    * eta: learning rate
@@ -43,158 +45,168 @@ Bp* newBp(const char* name, double eta, double alpha, double epsilon, int nC, in
    * nI: number of input taps
    * nN[]: number of nodes per layer
    * act[]: name of activation function per layer */
-  Bp* bp = malloc(1 * sizeof(Bp));
-  bp->name = strdup(name);  // malloc()
-  bp->eta = eta;
-  bp->alpha = alpha;
-  bp->epsilon = epsilon;
-  bp->e = MAXFLOAT;
-  bp->C = nC;
-  bp->P = nP;
-  bp->shuffle = shuffle;
-  bp->ord = malloc(bp->P * sizeof(int));
-  for (int p = 0; p < bp->P; p++) bp->ord[p] = p;
-  bp->L = nL;
-  bp->I = nI;
-  bp->N = malloc(bp->L * sizeof(int));
-  bp->f = malloc(bp->L * sizeof(Act));
-  bp->df = malloc(bp->L * sizeof(Act));
-  bp->p = malloc((bp->I + 1) * sizeof(double)); // +1 augmentation for bias node; see fn 1, LIR p 9
-  bp->p[bp->I] = 1.0;  // bias node output
-  bp->i = malloc(bp->L * sizeof(double*));
-  bp->o = malloc(bp->L * sizeof(double*));
-  bp->d = malloc(bp->L * sizeof(double*));
-  bp->w = malloc(bp->L * sizeof(double**));
-  bp->dw = malloc(bp->L * sizeof(double**));
-  for (int l = 0; l < bp->L; l++) {
+  Ebp* ebp = malloc(1 * sizeof(Ebp));
+  ebp->name = strdup(name);  // malloc()
+  ebp->eta = eta;
+  ebp->alpha = alpha;
+  ebp->epsilon = epsilon;
+  ebp->e = MAXFLOAT;
+  ebp->C = nC;
+  ebp->P = nP;
+  ebp->shuffle = shuffle;
+  ebp->ord = malloc(ebp->P * sizeof(int));
+  for (int p = 0; p < ebp->P; p++) ebp->ord[p] = p;
+  ebp->L = nL;
+  ebp->I = nI;
+  ebp->N = malloc(ebp->L * sizeof(int));
+  ebp->f = malloc(ebp->L * sizeof(Act));
+  ebp->df = malloc(ebp->L * sizeof(Act));
+  ebp->p = malloc((ebp->I + 1) * sizeof(double)); // +1 augmentation for bias node; see fn 1, LIR p 9
+  ebp->p[ebp->I] = 1.0;  // bias node output
+  ebp->i = malloc(ebp->L * sizeof(double*));
+  ebp->o = malloc(ebp->L * sizeof(double*));
+  ebp->d = malloc(ebp->L * sizeof(double*));
+  ebp->w = malloc(ebp->L * sizeof(double**));
+  ebp->dw = malloc(ebp->L * sizeof(double**));
+  for (int l = 0; l < ebp->L; l++) {
     const int J = nN[l];
-    const int I = l == 0 ? bp->I : nN[l - 1];
-    bp->N[l] = J;
-    setact(act[l], &(bp->f[l]), &(bp->df[l]));
-    bp->i[l] = l == 0 ? bp->p : bp->o[l - 1];  // point to upstream layer's augmented output vector
-    bp->o[l] = malloc((J + 1) * sizeof(double));
-    bp->o[l][J] = 1.0;  // bias node output
-    bp->d[l] = malloc(J * sizeof(double));
-    bp->w[l] = malloc(J * sizeof(double*));
-    bp->dw[l] = malloc(J * sizeof(double*));
+    const int I = l == 0 ? ebp->I : nN[l - 1];
+    ebp->N[l] = J;
+    setact(act[l], &(ebp->f[l]), &(ebp->df[l]));
+    ebp->i[l] = l == 0 ? ebp->p : ebp->o[l - 1];  // point to upstream layer's augmented output vector
+    ebp->o[l] = malloc((J + 1) * sizeof(double));
+    ebp->o[l][J] = 1.0;  // bias node output
+    ebp->d[l] = malloc(J * sizeof(double));
+    ebp->w[l] = malloc(J * sizeof(double*));
+    ebp->dw[l] = malloc(J * sizeof(double*));
     for (int j = 0; j < J; j++) {
-      bp->w[l][j] = malloc((I + 1) * sizeof(double));
-      bp->dw[l][j] = malloc((I + 1) * sizeof(double));
+      ebp->w[l][j] = malloc((I + 1) * sizeof(double));
+      ebp->dw[l][j] = malloc((I + 1) * sizeof(double));
       for (int i = 0; i <= I; i++) {
-        bp->w[l][j][i] = randin(-WGT_RANGE / 2.0, +WGT_RANGE / 2.0); // symmetry breaking; see LIR p 10
-        bp->dw[l][j][i] = 0.0;
+        ebp->w[l][j][i] = randin(-WGT_RANGE / 2.0, +WGT_RANGE / 2.0); // symmetry breaking; see LIR p 10
+        ebp->dw[l][j][i] = 0.0;
       }
     }
   }
-  return bp;
+  return ebp;
 }
 
-void delBp(Bp* bp) {
+void delBp(Ebp* ebp) {
   /* Destroy the network. */
-  for (int l = 0; l < bp->L; l++) {
-    for (int j = 0; j < bp->N[l]; j++) {
-      free(bp->dw[l][j]);
-      free(bp->w[l][j]);
+  for (int l = 0; l < ebp->L; l++) {
+    for (int j = 0; j < ebp->N[l]; j++) {
+      free(ebp->dw[l][j]);
+      free(ebp->w[l][j]);
     }
-    free(bp->dw[l]);
-    free(bp->w[l]);
-    free(bp->d[l]);
-    free(bp->o[l]);
+    free(ebp->dw[l]);
+    free(ebp->w[l]);
+    free(ebp->d[l]);
+    free(ebp->o[l]);
   }
-  free(bp->dw);
-  free(bp->w);
-  free(bp->d);
-  free(bp->o);
-  free(bp->i);
-  free(bp->p);
-  free(bp->df);
-  free(bp->f);
-  free(bp->N);
-  free(bp->ord);
-  free(bp->name);
-  free(bp);
+  free(ebp->dw);
+  free(ebp->w);
+  free(ebp->d);
+  free(ebp->o);
+  free(ebp->i);
+  free(ebp->p);
+  free(ebp->df);
+  free(ebp->f);
+  free(ebp->N);
+  free(ebp->ord);
+  free(ebp->name);
+  free(ebp);
 }
 
-static void forward(const double* p, Bp* bp) {
+static void forward(const double* p, Ebp* ebp) {
   /* Feed the pattern p forward. */
-  memcpy(bp->p, p, bp->I * sizeof(double)); // network [p] = input [p]; does not overwrite bias node
+  memcpy(ebp->p, p, ebp->I * sizeof(double)); // network [p] = input [p]; does not overwrite bias node
   // feed forward pattern
-  for (int l = 0; l < bp->L; l++) { // from the first layer to the last
-    const int J = bp->N[l];
+  for (int l = 0; l < ebp->L; l++) { // from the first layer to the last
+    const int J = ebp->N[l];
     for (int j = 0; j < J; j++) {
-      const int I = l == 0 ? bp->I : bp->N[l - 1];
+      const int I = l == 0 ? ebp->I : ebp->N[l - 1];
       double net = 0.0;
-      for (int i = 0; i <= I; i++) net += bp->w[l][j][i] * bp->i[l][i];
-      bp->o[l][j] = bp->f[l](net); // see eq 7, LIR p 6
+      for (int i = 0; i <= I; i++) net += ebp->w[l][j][i] * ebp->i[l][i];
+      ebp->o[l][j] = ebp->f[l](net); // see eq 7, LIR p 6
     }
   }
 }
 
-static void backward(const double* p, Bp* bp) {
-  const int lo = bp->L - 1;
+static void backward(const double* p, Ebp* ebp) {
+  const int lo = ebp->L - 1;
   for (int l = lo; l >= 0; l--) { // from the last layer to the first
-    const int J = bp->N[l];
+    const int J = ebp->N[l];
     // calculate deltas
     if (l == lo) { // for output nodes
       for (int j = 0; j < J; j++) {
-        double err = p[j] - bp->o[l][j];
-        bp->d[l][j] = err * bp->df[l](bp->o[l][j]); // see eq 13, LIR p 7
+        double err = p[j] - ebp->o[l][j];
+        ebp->d[l][j] = err * ebp->df[l](ebp->o[l][j]); // see eq 13, LIR p 7
       }
     } else { // for hidden nodes
       const int ld = l + 1; // adjacent downstream layer
-      const int K = bp->N[ld];
+      const int K = ebp->N[ld];
       for (int j = 0; j < J; j++) {
         double err = 0.0;
-        for (int k = 0; k < K; k++) err += bp->w[ld][k][j] * bp->d[ld][k];
-        bp->d[l][j] = err * bp->df[l](bp->o[l][j]); // see eq 14, LIR p 7
+        for (int k = 0; k < K; k++) err += ebp->w[ld][k][j] * ebp->d[ld][k];
+        ebp->d[l][j] = err * ebp->df[l](ebp->o[l][j]); // see eq 14, LIR p 7
       }
     }
     // calculate del-weights
-    for (int j = 0; j < bp->N[l]; j++) {
-      const int I = l == 0 ? bp->I : bp->N[l - 1];
-      for (int i = 0; i <= I; i++) bp->dw[l][j][i] = bp->eta * bp->d[l][j] * bp->i[l][i] + bp->alpha * bp->dw[l][j][i]; // see eq 16, LIR p 9
+    for (int j = 0; j < ebp->N[l]; j++) {
+      const int I = l == 0 ? ebp->I : ebp->N[l - 1];
+      for (int i = 0; i <= I; i++) ebp->dw[l][j][i] = ebp->eta * ebp->d[l][j] * ebp->i[l][i] + ebp->alpha * ebp->dw[l][j][i]; // see eq 16, LIR p 9
     }
   }
 }
 
-void learn(double** ii, double** tt, Bp* bp) {
+void learn(double** ii, double** tt, Ebp* ebp) {
   /* Train the network.
    * ii[]: input patterns
    * tt[]: associated target patterns (to calculate recall errors) */
-  printf("learn %s\n", bp->name);
-  const int lo = bp->L - 1;
-  for (int c = 0; bp->e > bp->epsilon && c < bp->C; c++) {
+  printf("learn %s\n", ebp->name);
+  const int lo = ebp->L - 1;
+  for (int c = 0; ebp->e > ebp->epsilon && c < ebp->C; c++) {
     // learn one cycle
-    if (bp->shuffle) shuffle(bp->P, bp->ord);
-    bp->e = 0.0;
-    for (int p = 0; p < bp->P; p++) {
-      forward(ii[bp->ord[p]], bp);
-      backward(tt[bp->ord[p]], bp);
-      for (int j = 0; j < bp->N[lo]; j++) bp->e += sqre(bp->d[lo][j]); // sum of squares error; see LIR p 4
+    if (ebp->shuffle) shuffle(ebp->P, ebp->ord);
+    ebp->e = 0.0;
+    for (int p = 0; p < ebp->P; p++) {
+      forward(ii[ebp->ord[p]], ebp);
+      backward(tt[ebp->ord[p]], ebp);
+      for (int j = 0; j < ebp->N[lo]; j++) ebp->e += sqre(ebp->d[lo][j]); // sum of squares error; see LIR p 4
     }
-    bp->e = sqrt(bp->e) / bp->N[lo] / bp->P; // root-mean-square error; see eq 4.35, ANS p 196
     // update weights at end of cycle
-    for (int l = 0; l < bp->L; l++)
-      for (int j = 0; j < bp->N[l]; j++) {
-        const int I = l == 0 ? bp->I : bp->N[l - 1];
-        for (int i = 0; i <= I; i++) bp->w[l][j][i] += bp->dw[l][j][i]; // (w) = (w) + (dw)
+    for (int l = 0; l < ebp->L; l++)
+      for (int j = 0; j < ebp->N[l]; j++) {
+        const int I = l == 0 ? ebp->I : ebp->N[l - 1];
+        for (int i = 0; i <= I; i++) ebp->w[l][j][i] += ebp->dw[l][j][i]; // (w) = (w) + (dw)
       }
-    if (bp->e < bp->epsilon || c % (bp->C / 10) == 0) report(c, bp);
+    // report training error
+    ebp->e = sqrt(ebp->e) / ebp->N[lo] / ebp->P; // root-mean-square error; see eq 4.35, ANS p 196
+    if (ebp->e < ebp->epsilon || c % (ebp->C / 10) == 0) report(c, ebp);
   }
 }
 
-void recall(int P, double** ii, double** tt, Bp* bp) {
+void recall(int P, double** ii, double** tt, Ebp* ebp) {
   /* Test the network.
    * P: number of data patterns
    * ii[]: input patterns
    * tt[]: associated target patterns (to calculate recall errors) */
-  printf("recall %s\n", bp->name);
-  const int lo = bp->L - 1;
-  bp->e = 0.0;
+  printf("recall %s\n", ebp->name);
+  const int lo = ebp->L - 1;
+  ebp->e = 0.0;
   for (int p = 0; p < P; p++) {
-    forward(ii[p], bp);
-    for (int j = 0; j < bp->N[lo]; j++) bp->e += sqre(tt[p][j] - bp->o[lo][j]);
+    // feed a test pattern
+    forward(ii[p], ebp);
+    for (int j = 0; j < ebp->N[lo]; j++) ebp->e += sqre(tt[p][j] - ebp->o[lo][j]);
+    // show input-output associations
+    printf("p = %-10d\n", p);
+    printf("  i = ");
+    for (int j = 0; j < ebp->I; j++) printf("| %+10.4f ", ebp->i[0][j]);
+    printf("|\n  o = ");
+    for (int j = 0; j < ebp->N[lo]; j++) printf("| %+10.4f ", ebp->o[lo][j]);
+    printf("|\n");
   }
-  bp->e = sqrt(bp->e) / bp->N[lo] / P;
-  report(-1, bp);
+  // report recall error
+  ebp->e = sqrt(ebp->e) / ebp->N[lo] / P;
+  report(-1, ebp);
 }

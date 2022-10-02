@@ -6,20 +6,7 @@
 
 #include "etc.h"
 
-extern double rampb(double);
-extern double drampb(double);
-extern double rampu(double);
-extern double drampu(double);
-extern double logisticb(double);
-extern double dlogisticb(double);
-extern double logisticu(double);
-extern double dlogisticu(double);
-extern double stepb(double);
-extern double dstepb(double);
-extern double stepu(double);
-extern double dstepu(double);
-
-typedef struct Bp {
+typedef struct Ebp {
   char* name; // network name
   double eta; // learning rate
   double alpha; // momentum factor
@@ -40,12 +27,12 @@ typedef struct Bp {
   double** d; // delta vector d[l][j]
   double*** w; // augmented weight matrix w[l][j][i]
   double*** dw; // augmented del-weight matrix dw[l][j][i]
-} Bp;
+} Ebp;
 
-extern Bp* newBp(const char* name, double eta, double alpha, double epsilon, int C, int P, bool shuffle, int L, int I, const int* N, char** act);
-extern void delBp(Bp* bp);
-extern void learn(double** ii, double** tt, Bp* bp);
-extern void recall(int P, double** ii, double** tt, Bp* bp);
-extern void dump(Bp* bp);
+extern Ebp* newBp(const char* name, double eta, double alpha, double epsilon, int C, int P, bool shuffle, int L, int I, const int* N, char** act);
+extern void delBp(Ebp* ebp);
+extern void learn(double** ii, double** tt, Ebp* ebp);
+extern void recall(int P, double** ii, double** tt, Ebp* ebp);
+extern void dump(Ebp* ebp);
 
 #endif // NN_LIR_H

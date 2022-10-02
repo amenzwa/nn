@@ -62,11 +62,11 @@ static void run(const char* name) {
   sprintf(buf, "%s/dat/%s-t.csv", cwd, name);
   double** tt = load(P, buf);
   // train network
-  Bp* bp = newBp(name, eta, alpha, epsilon, C, P, shuffle, L, I, N, act);
-  learn(ii, tt, bp);
-  dump(bp);
-  recall(P, ii, tt, bp);
-  delBp(bp);
+  Ebp* ebp = newBp(name, eta, alpha, epsilon, C, P, shuffle, L, I, N, act);
+  learn(ii, tt, ebp);
+  dump(ebp);
+  recall(P, ii, tt, ebp);
+  delBp(ebp);
   // terminate
   toss(P, tt);
   toss(P, ii);
