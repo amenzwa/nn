@@ -72,7 +72,7 @@ static inline void report(int c, Som* som) {
 
 /* self-organizing map */
 
-Som* newSom(const char* name, double alpha, double epsilon, int C, int P, bool shuffle, int I, int H, int W, Dist dist) {
+Som* somnew(const char* name, double alpha, double epsilon, int C, int P, bool shuffle, int I, int H, int W, Dist dist) {
   /* Create a network.
    * name: network name for use in report()
    * alpha: learning factor
@@ -105,14 +105,14 @@ Som* newSom(const char* name, double alpha, double epsilon, int C, int P, bool s
   const int S = side(0, som);
   som->hood = malloc(S * S * sizeof(Loc)); // 1D array representing the 2D neighborhood square
   som->dist = dist;
-  som->i = newVec(som->I);
+  som->i = vecnew(som->I);
   som->m = malloc(som->H * sizeof(Vec**));
   som->hits = malloc(som->H * sizeof(int*));
   for (int y = 0; y < som->H; y++) {
     som->m[y] = malloc(som->W * sizeof(Vec*));
     som->hits[y] = malloc(som->W * sizeof(int));
     for (int x = 0; x < som->W; x++) {
-      som->m[y][x] = newVec(som->I);
+      som->m[y][x] = vecnew(som->I);
       for (int i = 0; i < som->I; i++) som->m[y][x]->c[i] = randin(-WGT_RANGE / 2.0, +WGT_RANGE / 2.0); // symmetry breaking; see LIR p 10
       som->hits[y][x] = 0;
     }
@@ -120,16 +120,16 @@ Som* newSom(const char* name, double alpha, double epsilon, int C, int P, bool s
   return som;
 }
 
-void delSom(Som* som) {
+void somdel(Som* som) {
   /* Destroy the network. */
   for (int y = 0; y < som->H; y++) {
-    for (int x = 0; x < som->W; x++) delVec(som->m[y][x]);
+    for (int x = 0; x < som->W; x++) vecdel(som->m[y][x]);
     free(som->hits[y]);
     free(som->m[y]);
   }
   free(som->hits);
   free(som->m);
-  delVec(som->i);
+  vecdel(som->i);
   free(som->hood);
   free(som->ord);
   free(som->name);
@@ -154,9 +154,9 @@ static Loc winner(const Vec* p, Som* som) {
 static void update(const Vec* x, Loc n, double a, Som* som) {
   /* Update the weights of the winner and its neighborhood. */
   Vec* w = som->m[n.y][n.x]; // [w] = [m]_winner
-  subVVV(x, w, som->i); // [i] = [x] - [w]
-  mulSVV(a, som->i, som->i); // [i] = alpha * [i]
-  addVVV(w, som->i, w); // [w] = [w] + [i]; see eq 6, section II-B, SOM p 1467
+  vecsub(x, w, som->i); // [i] = [x] - [w]
+  vecscale(a, som->i, som->i); // [i] = alpha * [i]
+  vecadd(w, som->i, w); // [w] = [w] + [i]; see eq 6, section II-B, SOM p 1467
 }
 
 void learn(Vec** ii, Som* som) {
@@ -179,7 +179,7 @@ void learn(Vec** ii, Som* som) {
           Loc n = hc[toindex(S, x, y)];
           if (isinside(n, som)) update(v, n, alpha(c, nc, n, som), som);
         }
-      som->e += foldVec(sumsqre, 0.0, som->i);
+      som->e += vecfold(sumsqre, 0.0, som->i);
     }
     // report training error
     som->e = sqrt(som->e) / (som->W + som->H) / som->P;
@@ -196,7 +196,7 @@ void recall(Vec** ii, Som* som) {
     // select the winner
     const Vec* v = ii[p];
     Loc nc = winner(v, som);
-    som->e += foldVec(sumsqre, 0.0, som->i);
+    som->e += vecfold(sumsqre, 0.0, som->i);
     // show pattern-winner association
     printf("p = %-10d ", p);
     for (int i = 0; i < v->C; i++) printf("| %+10.4f ", v->c[i]);

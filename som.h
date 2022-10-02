@@ -36,8 +36,8 @@ typedef struct Som {
   int** hits; // hits per node
 } Som;
 
-extern Som* newSom(const char* name, double alpha, double epsilon, int C, int P, bool shuffle, int I, int H, int W, Dist dist);
-extern void delSom(Som* som);
+extern Som* somnew(const char* name, double alpha, double epsilon, int C, int P, bool shuffle, int I, int H, int W, Dist dist);
+extern void somdel(Som* som);
 extern void learn(Vec** ii, Som* som);
 extern void recall(Vec** ii, Som* som);
 extern void dump(Som* som);

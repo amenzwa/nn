@@ -12,25 +12,25 @@
 #include "som.h"
 
 static Vec** load(int P, const char* file) {
-  Csv* csv = newCsv(file);
-  loadCsv(csv);
+  Csv* csv = csvnew(file);
+  csvload(csv);
   Vec** pp = malloc(P * sizeof(Vec*));
   for (int p = 0; p < P; p++) {
-    pp[p] = newVec(csv->F);
+    pp[p] = vecnew(csv->F);
     for (int j = 0; j < csv->F; j++) pp[p]->c[j] = atof(csv->r[p][j]);
   }
-  delCsv(csv);
+  csvdel(csv);
   return pp;
 }
 
 static void toss(int P, Vec** pp) {
-  for (int p = 0; p < P; p++) delVec(pp[p]);
+  for (int p = 0; p < P; p++) vecdel(pp[p]);
   free(pp);
 }
 
 static Dist dist(const char* d) {
-  if (strcmp(d, "inner") == 0) return dotVVS;
-  else if (strcmp(d, "euclidean") == 0) return eucVVS;
+  if (strcmp(d, "inner") == 0) return vecinner;
+  else if (strcmp(d, "euclidean") == 0) return veceuclidean;
   else {
     fprintf(stderr, "ERROR: unknown distance measure %s\n", d);
     exit(1);
@@ -43,8 +43,8 @@ static void run(const char* name) {
   getcwd(cwd, sizeof(cwd)); // current working directory
   char buf[1024];
   sprintf(buf, "%s/dat/%s.csv", cwd, name); // ~cwd/dat/"name".csv
-  Csv* cfgcsv = newCsv(buf);
-  loadCsv(cfgcsv);
+  Csv* cfgcsv = csvnew(buf);
+  csvload(cfgcsv);
   int f = 1; // CSV field; start at 1 to skip network name field
   int C = atoi(cfgcsv->r[1][f++]); // cfgcsv->r[1] holds data, r[0] holds header
   int I = atoi(cfgcsv->r[1][f++]);
@@ -55,17 +55,17 @@ static void run(const char* name) {
   double epsilon = atof(cfgcsv->r[1][f++]);
   int P = atoi(cfgcsv->r[1][f++]);
   bool shuffle = istrue(cfgcsv->r[1][f++]);
-  delCsv(cfgcsv);
+  csvdel(cfgcsv);
   cfgcsv = NULL;
   // load pattern vectors
   sprintf(buf, "%s/dat/%s-i.csv", cwd, name);
   Vec** ii = load(P, buf);
   // train network
-  Som* som = newSom(name, alpha, epsilon, C, P, shuffle, I, H, W, d);
+  Som* som = somnew(name, alpha, epsilon, C, P, shuffle, I, H, W, d);
   learn(ii, som);
   dump(som);
   recall(ii, som);
-  delSom(som);
+  somdel(som);
   // terminate
   toss(P, ii);
 }

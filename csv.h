@@ -5,7 +5,6 @@
 #define NN_CSV_H
 
 #define RECLEN 16384 // CSV record length (in bytes)
-#define MAXFLD 8192 // maximum number of CSV fields per record
 
 typedef struct Csv {
   char* name; // file name
@@ -14,9 +13,9 @@ typedef struct Csv {
   char*** r; // records
 } Csv;
 
-extern Csv* newCsv(const char* name);
-extern void delCsv(Csv* csv);
-extern void loadCsv(Csv* csv);
-extern void saveCsv(Csv* csv);
+extern Csv* csvnew(const char* name);
+extern void csvdel(Csv* csv);
+extern void csvload(Csv* csv);
+extern void csvsave(Csv* csv);
 
 #endif // NN_CSV_H

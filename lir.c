@@ -32,7 +32,7 @@ static inline void report(int c, Ebp* ebp) {
 
 /* back-propagation */
 
-Ebp* newBp(const char* name, double eta, double alpha, double epsilon, int nC, int nP, bool shuffle, int nL, int nI, const int* nN, char** act) {
+Ebp* ebpnew(const char* name, double eta, double alpha, double epsilon, int nC, int nP, bool shuffle, int nL, int nI, const int* nN, char** act) {
   /* Create a network.
    * name: network name for use in report()
    * eta: learning rate
@@ -91,7 +91,7 @@ Ebp* newBp(const char* name, double eta, double alpha, double epsilon, int nC, i
   return ebp;
 }
 
-void delBp(Ebp* ebp) {
+void ebpdel(Ebp* ebp) {
   /* Destroy the network. */
   for (int l = 0; l < ebp->L; l++) {
     for (int j = 0; j < ebp->N[l]; j++) {

@@ -11,14 +11,14 @@
 #include "lir.h"
 
 static double** load(int P, const char* file) {
-  Csv* csv = newCsv(file);
-  loadCsv(csv);
+  Csv* csv = csvnew(file);
+  csvload(csv);
   double** pp = malloc(P * sizeof(double*));
   for (int p = 0; p < P; p++) {
     pp[p] = malloc(csv->F * sizeof(double));
     for (int j = 0; j < csv->F; j++) pp[p][j] = atof(csv->r[p][j]);
   }
-  delCsv(csv);
+  csvdel(csv);
   return pp;
 }
 
@@ -33,8 +33,8 @@ static void run(const char* name) {
   getcwd(cwd, sizeof(cwd)); // current working directory
   char buf[1024];
   sprintf(buf, "%s/dat/%s.csv", cwd, name); // ~cwd/dat/"name".csv
-  Csv* cfgcsv = newCsv(buf);
-  loadCsv(cfgcsv);
+  Csv* cfgcsv = csvnew(buf);
+  csvload(cfgcsv);
   int f = 1; // CSV field; start at 1 to skip network name field
   int C = atoi(cfgcsv->r[1][f++]); // cfgcsv->r[1] holds data, r[0] holds header
   int L = atoi(cfgcsv->r[1][f++]);
@@ -54,7 +54,7 @@ static void run(const char* name) {
   double epsilon = atof(cfgcsv->r[1][f++]);
   int P = atoi(cfgcsv->r[1][f++]);
   bool shuffle = istrue(cfgcsv->r[1][f++]);
-  delCsv(cfgcsv);
+  csvdel(cfgcsv);
   cfgcsv = NULL;
   // load pattern vectors
   sprintf(buf, "%s/dat/%s-i.csv", cwd, name);
@@ -62,11 +62,11 @@ static void run(const char* name) {
   sprintf(buf, "%s/dat/%s-t.csv", cwd, name);
   double** tt = load(P, buf);
   // train network
-  Ebp* ebp = newBp(name, eta, alpha, epsilon, C, P, shuffle, L, I, N, act);
+  Ebp* ebp = ebpnew(name, eta, alpha, epsilon, C, P, shuffle, L, I, N, act);
   learn(ii, tt, ebp);
   dump(ebp);
   recall(P, ii, tt, ebp);
-  delBp(ebp);
+  ebpdel(ebp);
   // terminate
   toss(P, tt);
   toss(P, ii);

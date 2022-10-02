@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include "csv.h"
 
-Csv* newCsv(const char* name) {
+Csv* csvnew(const char* name) {
   Csv* csv = malloc(1 * sizeof(Csv));
   csv->name = strdup(name); // malloc()
   csv->R = csv->F = 0;
@@ -16,7 +16,7 @@ Csv* newCsv(const char* name) {
   return csv;
 }
 
-void delCsv(Csv* csv) {
+void csvdel(Csv* csv) {
   if (csv->r != NULL) {
     for (int r = 0; r < csv->R; r++) {
       for (int f = 0; f < csv->F; f++) free(csv->r[r][f]);
@@ -37,7 +37,7 @@ static char* unquote(char* t) {
   return t;
 }
 
-void loadCsv(Csv* csv) {
+void csvload(Csv* csv) {
   FILE* fi = fopen(csv->name, "r");
   if (fi == NULL) {
     fprintf(stderr, "ERROR: cannot load CSV file %s\n", csv->name);
@@ -66,7 +66,7 @@ void loadCsv(Csv* csv) {
   fclose(fi);
 }
 
-void saveCsv(Csv* csv) {
+void csvsave(Csv* csv) {
   FILE* fo = fopen(csv->name, "w");
   if (fo == NULL) {
     fprintf(stderr, "ERROR: cannot save CSV file %s\n", csv->name);

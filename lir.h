@@ -29,8 +29,8 @@ typedef struct Ebp {
   double*** dw; // augmented del-weight matrix dw[l][j][i]
 } Ebp;
 
-extern Ebp* newBp(const char* name, double eta, double alpha, double epsilon, int C, int P, bool shuffle, int L, int I, const int* N, char** act);
-extern void delBp(Ebp* ebp);
+extern Ebp* ebpnew(const char* name, double eta, double alpha, double epsilon, int C, int P, bool shuffle, int L, int I, const int* N, char** act);
+extern void ebpdel(Ebp* ebp);
 extern void learn(double** ii, double** tt, Ebp* ebp);
 extern void recall(int P, double** ii, double** tt, Ebp* ebp);
 extern void dump(Ebp* ebp);
