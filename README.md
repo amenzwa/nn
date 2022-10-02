@@ -31,7 +31,7 @@ for p in P # data patterns
 
 That is a whole lot of `for` loops. But it is an honest translation of Rumelhart's algorithm to C.
 
-On the other hand, every implementation of back-propagation you will find on the Internet, be it a prototype or a production version, will use vector algebra. Indeed, the most popular deep learning framework, [TensorFlow](https://www.tensorflow.org/), is named so because it is implemented using [tensors](https://en.wikipedia.org/wiki/Tensor). Simply put, tensors are extensions of matrices, just like matrices are extensions of vectors and vectors are extensions of scalars.
+On the other hand, every implementation of back-propagation you will find on the Internet, be it a prototype or a production version, will use vector algebra. Indeed, the most popular deep learning framework, [TensorFlow](https://www.tensorflow.org/), is named so because it is implemented using [tensors](https://en.wikipedia.org/wiki/Tensor). Simply put, tensors are dimensional extensions of matrices, just like matrices are extensions of vectors and vectors are extensions of scalars.
 
 In vectorised version, like that described in ANS, the data pattern is the `p` vector, the weights of the layer `l` is the `w[l]` matrix, the output of the layer `l` is the `o[l]` vector, and so on. Matrix-based implementation is well-suited to modern GPUs, which are equipped with powerful matrix manipulation pipelines (because transformations in [3D computer graphics](https://en.wikipedia.org/wiki/Transformation_matrix#Examples_in_3D_computer_graphics) are implemented using matrices). The matrix-based implementation is also far more compact and is easier to understand. The loopy pseudocode above reduces to the following vectorised pseudocode:
 
