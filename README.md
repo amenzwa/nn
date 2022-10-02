@@ -29,9 +29,9 @@ for p in P # data patterns
       o[l][j] = f(net);
 ```
 
-That is a whole lot of `for` loops. But it is an honest translation of Rumelhart's algorithm to C. So, you can use this straightforward implementation to study the LIR paper.
+That is a whole lot of `for` loops. But it is an honest translation of Rumelhart's algorithm to C.
 
-But every implementation of back-propagation you will find on the Internet, be it a prototype or a production version, will use vector algebra. Indeed, the most popular deep learning framework, [TensorFlow](https://www.tensorflow.org/), is named so because it is implemented using [tensors](https://en.wikipedia.org/wiki/Tensor). Just as vectors are extensions of scalars and matrices are extensions of vectors, tensors are extensions of matrices from 2D to $n$D.
+On the other hand, every implementation of back-propagation you will find on the Internet, be it a prototype or a production version, will use vector algebra. Indeed, the most popular deep learning framework, [TensorFlow](https://www.tensorflow.org/), is named so because it is implemented using [tensors](https://en.wikipedia.org/wiki/Tensor). Simply put, tensors are extensions of matrices, just like matrices are extensions of vectors and vectors are extensions of scalars.
 
 In vectorised version, like that described in ANS, the data pattern is the `p` vector, the weights of the layer `l` is the `w[l]` matrix, the output of the layer `l` is the `o[l]` vector, and so on. Matrix-based implementation is well-suited to modern GPUs, which are equipped with powerful matrix manipulation pipelines (because transformations in [3D computer graphics](https://en.wikipedia.org/wiki/Transformation_matrix#Examples_in_3D_computer_graphics) are implemented using matrices). The matrix-based implementation is also far more compact and is easier to understand. The loopy pseudocode above reduces to the following vectorised pseudocode:
 
@@ -41,7 +41,7 @@ for p in P
     o[l] = f(w[l] * p)
 ```
 
-Despite all the advantages of the matrix-based implementation, I chose to implement the LIR algorithm so as to show explicitly how the equations are realised in code. That is the main purpose of this project.
+Despite all the advantages of the matrix-based EBP implementation, I chose the `for` loop version given in LIR, so as to show explicitly how the equations are realised in code. Unlike LIR, through, SOM presents its algorithm in matrix notation. As such, I give here a vectorised implementation for SOM.
 
 ## *using the programme*
 
@@ -112,7 +112,7 @@ The procedure `run()` in `*main.c` first loads from the `dat/` data directory th
   - `shuffle`—shuffle pattern presentation order
 
 
-Using these parameters, `run()` creates a network, loads the pattern vectors, and train the network. During training, the current RMS error is reported every few cycles. Upon completion of training, `run()` prints out the final weights. The pattern vectors are specified in their respective CSV files, one row per pattern.
+Using these network parameters, `run()` creates a network, loads the pattern vectors, and train the network. During training, the current RMS error is reported every few cycles. Upon completion of training, `run()` prints out the final weights. The pattern vectors are specified in their respective CSV files, one row per pattern.
 
 The module `etc.[ch]` implements utilities common to both EBP and SOM networks, such as the initial weights randomiser. This module also contains the various activation functions used by the EBP network. Each activation function has a unipolar version and a bipolar version.
 
