@@ -1,2 +1,2 @@
 name,C,I,W,H,dist,alpha,epsilon,P,shuffle
-rgb,100000,3,4,3,euclidean,0.9,0.1,16,TRUE
+rgb,500000,3,4,3,euclidean,0.9,0.1,16,TRUE
