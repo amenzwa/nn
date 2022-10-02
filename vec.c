@@ -59,7 +59,7 @@ double dotVVS(const Vec* u, const Vec* v) {
 }
 
 double eucVVS(const Vec* u, const Vec* v) {
-  /* euc = |[u] - [v]| */
+  /* euc = ||[u] - [v]|| */
   double euc = 0.0;
   for (int c = 0; c < u->C; c++) euc += sqre(u->c[c] - v->c[c]);
   return sqrt(euc);
