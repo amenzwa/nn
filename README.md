@@ -30,7 +30,7 @@ Next, we propagate the output-layer error signal, which was caused by a training
 
 Using the weight adjustment equation given above, we accumulate the $\Delta \mathbf{W}$ for all the layers, for each data pattern. We then adjust all the weights in the network simultaneously: $\mathbf{W} \leftarrow \mathbf{W} + \Delta \mathbf{W}$. This complete one _training cycle_. A typical EBP network requires repeating the training cycle about $10,000$ times or until the [root-mean square](https://en.wikipedia.org/wiki/Root_mean_square) (RMS) error over one cycle dips below a predefined error criterion.
 
-**_self-organising map unsupervised learning algorithm_**—SOM is a connectionist version of the well known [$k$-means clustering](https://en.wikipedia.org/wiki/K-means_clustering) technique. The innovation that SOM brings, not surprisingly, is the efficient, parallel implementation. The $k$-means algorithm is notoriously slow: it is [NP-hard](https://en.wikipedia.org/wiki/NP-hardness).
+**_self-organising map unsupervised learning algorithm_**—SOM is a connectionist version of the well known [*k*-means clustering](https://en.wikipedia.org/wiki/K-means_clustering) technique. The innovation that SOM brings, not surprisingly, is the efficient, parallel implementation. The $k$-means algorithm is notoriously slow: it is [NP-hard](https://en.wikipedia.org/wiki/NP-hardness).
 
 EBP is a simple algorithm. SOM is at least an order of magnitude simpler. SOM consists of one layer of neurons, called the _map_. Being an unsupervised algorithm, it requires no target vectors. The neurons in the map are arranged either in a rectangular grid or a hexagonal grid. For simplicity, we shall consider a rectangular grid.
 
