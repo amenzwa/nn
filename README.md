@@ -1,4 +1,4 @@
-#nn#
+#nn
 
 ## _a simple neural networks implementation in C_
 
