@@ -48,8 +48,8 @@ inline void vecscale(double s, const Vec* v, Vec* o) {
 
 void vecouter(const Vec* u, const Vec* v, Mat* o) {
   /* (o) = [u]' * [v] */
-  for (int r = 0; r < u->C; r++)
-    for (int c = 0; c < v->C; c++) o->r[r]->c[c] = u->c[r] * v->c[c];
+  for (int r = 0; r < v->C; r++)
+    for (int c = 0; c < u->C; c++) o->r[r]->c[c] = u->c[r] * v->c[c];
 }
 
 double vecinner(const Vec* u, const Vec* v) {
