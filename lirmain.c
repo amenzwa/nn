@@ -63,9 +63,9 @@ static void run(const char* name) {
   double** tt = load(P, buf);
   // train network
   Ebp* ebp = ebpnew(name, eta, alpha, epsilon, C, P, shuffle, L, I, N, act);
-  learn(ii, tt, ebp);
+  learn(ebp, ii, tt);
   dump(ebp);
-  recall(P, ii, tt, ebp);
+  recall(ebp, P, ii, tt);
   ebpdel(ebp);
   // terminate
   toss(P, tt);

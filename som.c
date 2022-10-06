@@ -154,12 +154,12 @@ static Loc winner(const Vec* p, Som* som) {
 static void update(const Vec* x, Loc n, double a, Som* som) {
   /* Update the weights of the winner and its neighborhood. */
   Vec* w = som->m[n.y][n.x]; // [w] = [m]_winner
-  vecsub(x, w, som->i); // [i] = [x] - [w]
-  vecscale(a, som->i, som->i); // [i] = alpha * [i]
-  vecadd(w, som->i, w); // [w] = [w] + [i]; see eq 6, section II-B, SOM p 1467
+  vecsub(som->i, x, w); // [i] = [x] - [w]
+  vecscale(som->i, a, som->i); // [i] = alpha * [i]
+  vecadd(w, w, som->i); // [w] = [w] + [i]; see eq 6, section II-B, SOM p 1467
 }
 
-void learn(Vec** ii, Som* som) {
+void learn(Som* som, Vec** ii) {
   /* Train the network.
    * ii[]: input patterns */
   printf("learn %s\n", som->name);
@@ -187,7 +187,7 @@ void learn(Vec** ii, Som* som) {
   }
 }
 
-void recall(Vec** ii, Som* som) {
+void recall(Som* som, Vec** ii) {
   /* Test the network.
    * ii[]: input patterns */
   printf("recall %s\n", som->name);

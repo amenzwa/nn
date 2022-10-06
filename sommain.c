@@ -62,9 +62,9 @@ static void run(const char* name) {
   Vec** ii = load(P, buf);
   // train network
   Som* som = somnew(name, alpha, epsilon, C, P, shuffle, I, H, W, d);
-  learn(ii, som);
+  learn(som, ii);
   dump(som);
-  recall(ii, som);
+  recall(som, ii);
   somdel(som);
   // terminate
   toss(P, ii);

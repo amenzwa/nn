@@ -159,7 +159,7 @@ static void backward(const double* p, Ebp* ebp) {
   }
 }
 
-void learn(double** ii, double** tt, Ebp* ebp) {
+void learn(Ebp* ebp, double** ii, double** tt) {
   /* Train the network.
    * ii[]: input patterns
    * tt[]: associated target patterns (to calculate recall errors) */
@@ -186,7 +186,7 @@ void learn(double** ii, double** tt, Ebp* ebp) {
   }
 }
 
-void recall(int P, double** ii, double** tt, Ebp* ebp) {
+void recall(Ebp* ebp, int P, double** ii, double** tt) {
   /* Test the network.
    * P: number of data patterns
    * ii[]: input patterns

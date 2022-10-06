@@ -31,8 +31,8 @@ typedef struct Ebp {
 
 extern Ebp* ebpnew(const char* name, double eta, double alpha, double epsilon, int C, int P, bool shuffle, int L, int I, const int* N, char** act);
 extern void ebpdel(Ebp* ebp);
-extern void learn(double** ii, double** tt, Ebp* ebp);
-extern void recall(int P, double** ii, double** tt, Ebp* ebp);
+extern void learn(Ebp* ebp, double** ii, double** tt);
+extern void recall(Ebp* ebp, int P, double** ii, double** tt);
 extern void dump(Ebp* ebp);
 
 #endif // NN_LIR_H

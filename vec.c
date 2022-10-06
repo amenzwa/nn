@@ -26,27 +26,27 @@ void vecdel(Vec* v) {
   free(v);
 }
 
-inline void veccpy(const Vec* v, Vec* o) {
+inline void veccpy(Vec* o, const Vec* v) {
   /* [o] = [v] (copy only v->C components) */
   memcpy(o->c, v->c, v->C * sizeof(double));
 }
 
-inline void vecadd(const Vec* u, const Vec* v, Vec* o) {
+inline void vecadd(Vec* o, const Vec* u, const Vec* v) {
   /* [o] = [u] + [v] */
   for (int c = 0; c < u->C; c++) o->c[c] = u->c[c] + v->c[c];
 }
 
-inline void vecsub(const Vec* u, const Vec* v, Vec* o) {
+inline void vecsub(Vec* o, const Vec* u, const Vec* v) {
   /* [o] = [u] - [v] */
   for (int c = 0; c < u->C; c++) o->c[c] = u->c[c] - v->c[c];
 }
 
-inline void vecscale(double s, const Vec* v, Vec* o) {
+inline void vecscale(Vec* o, double s, const Vec* v) {
   /* [o] = s * [v] */
   for (int c = 0; c < v->C; c++) o->c[c] = s * v->c[c];
 }
 
-void vecouter(const Vec* u, const Vec* v, Mat* o) {
+void vecouter(Mat* o, const Vec* u, const Vec* v) {
   /* (o) = [u]' * [v] */
   for (int r = 0; r < v->C; r++)
     for (int c = 0; c < u->C; c++) o->r[r]->c[c] = u->c[r] * v->c[c];
@@ -66,7 +66,7 @@ double veceuclidean(const Vec* u, const Vec* v) {
   return sqrt(euc);
 }
 
-inline void vecmap(double (*f)(double), int C, const Vec* v, Vec* o) {
+inline void vecmap(Vec* o, double (*f)(double), int C, const Vec* v) {
   /* [o] = f [v] */
   for (int c = 0; c < C; c++) o->c[c] = f(v->c[c]);
 }
@@ -78,7 +78,7 @@ double vecfold(double (*f)(double, double), double unit, const Vec* v) {
   return acc;
 }
 
-inline void veczipwith(double (*f)(double, double), const Vec* u, const Vec* v, Vec* o) {
+inline void veczipwith(Vec* o, double (*f)(double, double), const Vec* u, const Vec* v) {
   /* [o] = [u] `f` [v] */
   for (int c = 0; c < u->C; c++) o->c[c] = f(u->c[c], v->c[c]);
 }
@@ -102,28 +102,28 @@ void matdel(Mat* m) {
   free(m);
 }
 
-void mattr(const Mat* m, Mat* o) {
+void mattr(Mat* o, const Mat* m) {
   /* (o) = (m)' */
   for (int r = 0; r < m->R; r++)
     for (int c = 0; c < m->C; c++) o->r[c]->c[r] = m->r[r]->c[c];
 }
 
-inline void matcol(int c, const Mat* m, Vec* o) {
+inline void matcol(Vec* o, int c, const Mat* m) {
   /* [o] = m(*, c) */
   for (int r = 0; r < m->R; r++) o->c[r] = m->r[r]->c[c];
 }
 
-inline void matadd(const Mat* m, const Mat* n, Mat* o) {
+inline void matadd(Mat* o, const Mat* m, const Mat* n) {
   /* (o) = (m) + (n) */
-  for (int r = 0; r < m->R; r++) vecadd(m->r[r], n->r[r], o->r[r]);
+  for (int r = 0; r < m->R; r++) vecadd(o->r[r], m->r[r], n->r[r]);
 }
 
-inline void matmul(const Mat* m, const Vec* v, Vec* o) {
+inline void matmul(Vec* o, const Mat* m, const Vec* v) {
   /* [o] = (m) * [v] */
   for (int r = 0; r < v->C; r++) o->c[r] = vecinner(m->r[r], v);
 }
 
-inline void matscale(double s, const Mat* m, Mat* o) {
+inline void matscale(Mat* o, double s, const Mat* m) {
   /* (o) = s * (m) */
-  for (int r = 0; r < m->R; r++) vecscale(s, m->r[r], o->r[r]);
+  for (int r = 0; r < m->R; r++) vecscale(o->r[r], s, m->r[r]);
 }

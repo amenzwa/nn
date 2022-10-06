@@ -38,8 +38,8 @@ typedef struct Som {
 
 extern Som* somnew(const char* name, double alpha, double epsilon, int C, int P, bool shuffle, int I, int H, int W, Dist dist);
 extern void somdel(Som* som);
-extern void learn(Vec** ii, Som* som);
-extern void recall(Vec** ii, Som* som);
+extern void learn(Som* som, Vec** ii);
+extern void recall(Som* som, Vec** ii);
 extern void dump(Som* som);
 
 #endif // NN_SOM_H

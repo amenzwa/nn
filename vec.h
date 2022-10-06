@@ -16,23 +16,23 @@ typedef struct Mat {
 
 extern Vec* vecnew(int C);
 extern void vecdel(Vec* v);
-extern void veccpy(const Vec* v, Vec* o);
-extern void vecadd(const Vec* u, const Vec* v, Vec* o);
-extern void vecsub(const Vec* u, const Vec* v, Vec* o);
-extern void vecscale(double s, const Vec* v, Vec* o);
-extern void vecouter(const Vec* u, const Vec* v, Mat* o);
+extern void veccpy(Vec* o, const Vec* v);
+extern void vecadd(Vec* o, const Vec* u, const Vec* v);
+extern void vecsub(Vec* o, const Vec* u, const Vec* v);
+extern void vecscale(Vec* o, double s, const Vec* v);
+extern void vecouter(Mat* o, const Vec* u, const Vec* v);
 extern double vecinner(const Vec* u, const Vec* v);
 extern double veceuclidean(const Vec* u, const Vec* v);
-extern void vecmap(double (*f)(double), int C, const Vec* v, Vec* o);
+extern void vecmap(Vec* o, double (*f)(double), int C, const Vec* v);
 extern double vecfold(double (*f)(double, double), double unit, const Vec* v);
-extern void veczipwith(double (*f)(double, double), const Vec* u, const Vec* v, Vec* o);
+extern void veczipwith(Vec* o, double (*f)(double, double), const Vec* u, const Vec* v);
 
 extern Mat* matnew(int R, int C);
 extern void matdel(Mat* m);
-extern void mattr(const Mat* m, Mat* o);
-extern void matcol(int c, const Mat* m, Vec* o);
-extern void matadd(const Mat* m, const Mat* n, Mat* o);
-extern void matmul(const Mat* m, const Vec* v, Vec* o);
-extern void matscale(double s, const Mat* m, Mat* o);
+extern void mattr(Mat* o, const Mat* m);
+extern void matcol(Vec* o, int c, const Mat* m);
+extern void matadd(Mat* o, const Mat* m, const Mat* n);
+extern void matmul(Vec* o, const Mat* m, const Vec* v);
+extern void matscale(Mat* o, double s, const Mat* m);
 
 #endif // NN_VEC_H
