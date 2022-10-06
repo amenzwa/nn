@@ -112,7 +112,6 @@ The procedure `run()` in `*main.c` first loads from the `dat/` data directory th
   - `I`—number of input taps
   - `W`—number of nodes in the $x$ direction
   - `H`—number of nodes in the $y$ direction
-  - `arch`—network architecture (`r4` for 4-neighbour rectangular; `r8` for 8-neighbour rectangular)
   - `dist`—distance measure (`inner` for inner product; `euclidean` for Euclidean distance)
   - `alpha`—learning factor
   - `epsilon`—RMS error criterion
