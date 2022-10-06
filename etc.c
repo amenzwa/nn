@@ -11,7 +11,7 @@
 inline bool iszero(double x) {
   /* The imprecision in the FPU hardware representation of real numbers,
    * it is impossible to check for exact zero equality like x == 0.0. */
-  return fabs(x) <= 10e-12;
+  return fabs(x) <= 1.0e-12;
 }
 
 inline bool istrue(const char* s) {
