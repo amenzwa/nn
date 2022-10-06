@@ -14,8 +14,8 @@ typedef struct Ebp {
   double e; // current cycle's error
   int C; // number of training cycles
   int P; // number of data patterns
-  bool shuffle; // shuffle the input vectors
-  int* ord; // input presentation order
+  bool shuffle; // shuffle input patterns
+  int* ord; // input pattern presentation order
   int L; // number of layers
   int I; // number of input taps
   int* N; // number of nodes N[l]
