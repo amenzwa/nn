@@ -25,7 +25,7 @@ void dump(Ebp* ebp) {
   }
 }
 
-static inline void report(int c, Ebp* ebp) {
+static inline void report(Ebp* ebp, int c) {
   /* Report the current training cycle and current training error. */
   printf("c = %-10d  e = %-10.8f\n", c, ebp->e);
 }
@@ -117,7 +117,7 @@ void ebpdel(Ebp* ebp) {
   free(ebp);
 }
 
-static void forward(const double* p, Ebp* ebp) {
+static void forward(Ebp* ebp, const double* p) {
   /* Feed the pattern p forward. */
   memcpy(ebp->p, p, ebp->I * sizeof(double)); // network [p] = input [p]; does not overwrite bias node
   // feed forward pattern
@@ -132,7 +132,7 @@ static void forward(const double* p, Ebp* ebp) {
   }
 }
 
-static void backward(const double* p, Ebp* ebp) {
+static void backward(Ebp* ebp, const double* p) {
   const int lo = ebp->L - 1;
   for (int l = lo; l >= 0; l--) { // from the last layer to the first
     const int J = ebp->N[l];
@@ -170,8 +170,8 @@ void learn(Ebp* ebp, double** ii, double** tt) {
     if (ebp->shuffle) shuffle(ebp->P, ebp->ord);
     ebp->e = 0.0;
     for (int p = 0; p < ebp->P; p++) {
-      forward(ii[ebp->ord[p]], ebp);
-      backward(tt[ebp->ord[p]], ebp);
+      forward(ebp, ii[ebp->ord[p]]);
+      backward(ebp, tt[ebp->ord[p]]);
       for (int j = 0; j < ebp->N[lo]; j++) ebp->e += sqre(ebp->d[lo][j]); // sum of squares error; see LIR p 4
     }
     // update weights at end of cycle
@@ -182,7 +182,7 @@ void learn(Ebp* ebp, double** ii, double** tt) {
       }
     // report training error
     ebp->e = sqrt(ebp->e) / ebp->N[lo] / ebp->P; // root-mean-square error; see eq 4.35, ANS p 196
-    if (ebp->e < ebp->epsilon || c % (ebp->C / 10) == 0) report(c, ebp);
+    if (ebp->e < ebp->epsilon || c % (ebp->C / 10) == 0) report(ebp, c);
   }
 }
 
@@ -196,7 +196,7 @@ void recall(Ebp* ebp, int P, double** ii, double** tt) {
   ebp->e = 0.0;
   for (int p = 0; p < P; p++) {
     // feed a test pattern
-    forward(ii[p], ebp);
+    forward(ebp, ii[p]);
     for (int j = 0; j < ebp->N[lo]; j++) ebp->e += sqre(tt[p][j] - ebp->o[lo][j]);
     // show input-output associations
     printf("p = %-10d\n", p);
@@ -208,5 +208,5 @@ void recall(Ebp* ebp, int P, double** ii, double** tt) {
   }
   // report recall error
   ebp->e = sqrt(ebp->e) / ebp->N[lo] / P;
-  report(-1, ebp);
+  report(ebp, -1);
 }
