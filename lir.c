@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <float.h>
 #include "etc.h"
 #include "lir.h"
 
@@ -50,7 +51,7 @@ Ebp* ebpnew(const char* name, double eta, double alpha, double epsilon, int nC, 
   ebp->eta = eta;
   ebp->alpha = alpha;
   ebp->epsilon = epsilon;
-  ebp->e = MAXFLOAT;
+  ebp->e = DBL_MAX;
   ebp->C = nC;
   ebp->P = nP;
   ebp->shuffle = shuffle;

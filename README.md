@@ -56,8 +56,11 @@ The project is structured thus:
 
 ```pseudocode
 ~/nn/
+  LICENSE         # MIT license
   Makefile        # build script
   README.md       # this document
+  bin/            # binaries directory
+    test.sh       # test script
   csv.[ch]        # CSV utility
   dat/            # CSV data directory
     lir-enc8*.csv # encoder problem from LIR

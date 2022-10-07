@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <float.h>
 #include "etc.h"
 #include "som.h"
 
@@ -92,7 +93,7 @@ Som* somnew(const char* name, double alpha, double epsilon, int C, int P, bool s
     exit(1);
   }
   som->epsilon = epsilon;
-  som->e = MAXFLOAT;
+  som->e = DBL_MAX;
   som->C = C;
   som->P = P;
   som->shuffle = shuffle;
@@ -139,7 +140,7 @@ void somdel(Som* som) {
 static Loc winner(Som* som, const Vec* p) {
   /* Select the winner. */
   Loc n = {.x = -1, .y = -1}; // winner
-  double min = MAXFLOAT;
+  double min = DBL_MAX;
   for (int y = 0; y < som->H; y++)
     for (int x = 0; x < som->W; x++) {
       double d = som->dist(p, som->m[y][x]);
