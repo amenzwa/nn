@@ -32,4 +32,5 @@ extern double dstepb(double x);
 extern double stepu(double x);
 extern double dstepu(double x);
 extern ActPair actpair(const char* act);
+
 #endif // NN_ETC_H

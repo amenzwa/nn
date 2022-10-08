@@ -30,9 +30,9 @@ static void toss(int P, double** pp) {
 
 static void run(const char* name) {
   // initialize
-  char cwd[1024];
+  char cwd[FLDSIZ];
   getcwd(cwd, sizeof(cwd)); // current working directory
-  char buf[1024];
+  char buf[FLDSIZ];
   sprintf(buf, "%s/dat/%s.csv", cwd, name); // ~cwd/dat/"name".csv
   Csv* cfgcsv = csvnew(buf);
   csvload(cfgcsv);

@@ -32,10 +32,8 @@ static void toss(int P, Vec** pp) {
 static Dist dist(const char* d) {
   if (strcmp(d, "inner") == 0) return vecinner;
   else if (strcmp(d, "euclidean") == 0) return veceuclidean;
-  else {
-    fprintf(stderr, "ERROR: unknown distance measure %s\n", d);
-    exit(1);
-  }
+  fprintf(stderr, "ERROR: unknown distance measure %s\n", d);
+  exit(1);
 }
 
 static void run(const char* name) {
