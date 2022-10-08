@@ -4,7 +4,8 @@
 #ifndef NN_CSV_H
 #define NN_CSV_H
 
-#define RECLEN 16384 // CSV record length (in bytes)
+#define RECSIZ 16384 // CSV record size (in bytes)
+#define FLDSIZ 256 // CSV field size (in bytes)
 
 typedef struct Csv {
   char* name; // file name

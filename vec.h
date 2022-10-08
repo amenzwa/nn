@@ -23,10 +23,9 @@ extern void vecscale(Vec* o, double s, const Vec* v);
 extern void vecouter(Mat* o, const Vec* u, const Vec* v);
 extern double vecinner(const Vec* u, const Vec* v);
 extern double veceuclidean(const Vec* u, const Vec* v);
-extern void vecmap(Vec* o, double (*f)(double), int C, const Vec* v);
-extern double vecfold(double (*f)(double, double), double unit, const Vec* v);
-extern void veczipwith(Vec* o, double (*f)(double, double), const Vec* u, const Vec* v);
-
+extern void vecmap(Vec* o, double (* f)(double), int C, const Vec* v);
+extern double vecfold(double (* f)(double, double), double unit, const Vec* v);
+extern void veczipwith(Vec* o, double (* f)(double, double), const Vec* u, const Vec* v);
 extern Mat* matnew(int R, int C);
 extern void matdel(Mat* m);
 extern void mattr(Mat* o, const Mat* m);

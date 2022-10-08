@@ -20,6 +20,7 @@ static Vec** load(int P, const char* file) {
     for (int j = 0; j < csv->F; j++) pp[p]->c[j] = atof(csv->r[p][j]);
   }
   csvdel(csv);
+  csv = NULL;
   return pp;
 }
 
@@ -39,9 +40,9 @@ static Dist dist(const char* d) {
 
 static void run(const char* name) {
   // initialize
-  char cwd[1024];
+  char cwd[FLDSIZ];
   getcwd(cwd, sizeof(cwd)); // current working directory
-  char buf[1024];
+  char buf[FLDSIZ];
   sprintf(buf, "%s/dat/%s.csv", cwd, name); // ~cwd/dat/"name".csv
   Csv* cfgcsv = csvnew(buf);
   csvload(cfgcsv);
@@ -66,8 +67,10 @@ static void run(const char* name) {
   dump(som);
   recall(som, ii);
   somdel(som);
+  som = NULL;
   // terminate
   toss(P, ii);
+  ii = NULL;
 }
 
 int main(int argc, const char** argv) {

@@ -90,27 +90,13 @@ inline double dstepu(double x) {
   return iszero(x) ? 0.99 : 0.01;
 }
 
-void setact(const char* act, Act* f, Act* df) {
-  if (strcmp(act, "rampb") == 0) {
-    *f = rampb;
-    *df = drampb;
-  } else if (strcmp(act, "rampu") == 0) {
-    *f = rampu;
-    *df = drampu;
-  } else if (strcmp(act, "logisticb") == 0) {
-    *f = logisticb;
-    *df = dlogisticb;
-  } else if (strcmp(act, "logisticu") == 0) {
-    *f = logisticu;
-    *df = dlogisticu;
-  } else if (strcmp(act, "stepb") == 0) {
-    *f = stepb;
-    *df = dstepb;
-  } else if (strcmp(act, "stepu") == 0) {
-    *f = stepu;
-    *df = dstepu;
-  } else {
-    fprintf(stderr, "ERROR: unknown activation function\n");
-    exit(1);
-  }
+ActPair actpair(const char* act) {
+  if (strcmp(act, "rampb") == 0) return (ActPair) {.f = rampb, .df = drampb};
+  else if (strcmp(act, "rampu") == 0) return (ActPair) {.f = rampu, .df = drampu};
+  else if (strcmp(act, "logisticb") == 0) return (ActPair) {.f = logisticb, .df = dlogisticb};
+  else if (strcmp(act, "logisticu") == 0) return (ActPair) {.f = logisticu, .df = dlogisticu};
+  else if (strcmp(act, "stepb") == 0) return (ActPair) {.f = stepb, .df = dstepb};
+  else if (strcmp(act, "stepu") == 0) return (ActPair) {.f = stepu, .df = dstepu};
+  fprintf(stderr, "ERROR: unknown activation function\n");
+  exit(1);
 }

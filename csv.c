@@ -9,8 +9,8 @@
 #include "csv.h"
 
 Csv* csvnew(const char* name) {
-  Csv* csv = malloc(1 * sizeof(Csv));
-  csv->name = strdup(name); // malloc()
+  Csv* csv = malloc(sizeof(Csv));
+  csv->name = strndup(name, FLDSIZ); // malloc()
   csv->R = csv->F = 0;
   csv->r = NULL;
   return csv;
@@ -23,8 +23,10 @@ void csvdel(Csv* csv) {
       free(csv->r[r]);
     }
     free(csv->r);
+    csv->r = NULL;
   }
   free(csv->name);
+  csv->name = NULL;
   free(csv);
 }
 
@@ -43,8 +45,8 @@ void csvload(Csv* csv) {
     fprintf(stderr, "ERROR: cannot load CSV file %s\n", csv->name);
     exit(1);
   }
-  char rec[RECLEN];
   // count records
+  char rec[RECSIZ];
   csv->R = 0;
   csv->F = 0;
   while (fgets(rec, sizeof(rec), fi) != NULL) {
@@ -61,7 +63,7 @@ void csvload(Csv* csv) {
     }
     csv->r[r] = malloc(csv->F * sizeof(char*));
     int f = 0;
-    for (char* t, * s = rec; (t = strtok(s, ",\n\r")) != NULL; s = NULL) csv->r[r][f++] = strdup(unquote(t)); // malloc()
+    for (char* t, * s = rec; (t = strtok(s, ",\n\r")) != NULL; s = NULL) csv->r[r][f++] = strndup(unquote(t), FLDSIZ); // malloc()
   }
   fclose(fi);
 }

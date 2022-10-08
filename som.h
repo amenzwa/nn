@@ -8,8 +8,8 @@
 #include "vec.h"
 
 #define ORDERING 1000 // number of cycles for early, ordering phase
-#define MIN_RADIUS 1 // minimum neighborhood radius
-#define END_ALPHA 0.1 // ending learning factor
+#define RADIUS_MIN 1 // minimum neighborhood radius
+#define ALPHA_MIN 0.1 // ending learning factor
 
 typedef struct Loc {
   int x, y; // node location on the map

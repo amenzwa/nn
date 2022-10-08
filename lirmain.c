@@ -19,6 +19,7 @@ static double** load(int P, const char* file) {
     for (int j = 0; j < csv->F; j++) pp[p][j] = atof(csv->r[p][j]);
   }
   csvdel(csv);
+  csv = NULL;
   return pp;
 }
 
@@ -40,15 +41,15 @@ static void run(const char* name) {
   int L = atoi(cfgcsv->r[1][f++]);
   int I = atoi(cfgcsv->r[1][f++]);
   // parse nodes per layer field formatted as "M|N..."
-  int* N = malloc(L * sizeof(int));
+  int N[L * sizeof(int)];
   strcpy(buf, cfgcsv->r[1][f++]);
   int l = 0;
   for (char* t, * s = buf; (t = strtok(s, "|\n\r")) != NULL; s = NULL) N[l++] = atoi(t);
   // parse activation function per layer field formatted as "f|g..."
   strcpy(buf, cfgcsv->r[1][f++]);
   l = 0;
-  char** act = malloc(L * sizeof(Act));
-  for (char* t, * s = buf; (t = strtok(s, "|\n\r")) != NULL; s = NULL) act[l++] = strdup(t); // malloc()
+  char* act[L * sizeof(Act)];
+  for (char* t, * s = buf; (t = strtok(s, "|\n\r")) != NULL; s = NULL) act[l++] = strndup(t, FLDSIZ); // malloc()
   double eta = atof(cfgcsv->r[1][f++]);
   double alpha = atof(cfgcsv->r[1][f++]);
   double epsilon = atof(cfgcsv->r[1][f++]);
@@ -67,12 +68,12 @@ static void run(const char* name) {
   dump(ebp);
   recall(ebp, P, ii, tt);
   ebpdel(ebp);
+  ebp = NULL;
   // terminate
   toss(P, tt);
+  tt = NULL;
   toss(P, ii);
-  for (l = 0; l < L; l++) free(act[l]);
-  free(act);
-  free(N);
+  ii = NULL;
 }
 
 int main(int argc, const char** argv) {

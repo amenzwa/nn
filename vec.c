@@ -14,7 +14,7 @@
 
 Vec* vecnew(int C) {
   /* Create a [C] vector. */
-  Vec* v = malloc(1 * sizeof(Vec));
+  Vec* v = malloc(sizeof(Vec));
   v->C = C;
   v->c = calloc(v->C, sizeof(double));
   return v;
@@ -23,11 +23,12 @@ Vec* vecnew(int C) {
 void vecdel(Vec* v) {
   /* Destroy the vector. */
   free(v->c);
+  v->c = NULL;
   free(v);
 }
 
 inline void veccpy(Vec* o, const Vec* v) {
-  /* [o] = [v] (copy only v->C components) */
+  /* [o] = [v] */
   memcpy(o->c, v->c, v->C * sizeof(double));
 }
 
@@ -53,32 +54,32 @@ void vecouter(Mat* o, const Vec* u, const Vec* v) {
 }
 
 double vecinner(const Vec* u, const Vec* v) {
-  /* dot = [u] . [v] */
-  double dot = 0.0;
-  for (int c = 0; c < u->C; c++) dot += u->c[c] * v->c[c];
-  return dot;
+  /* d = [u] . [v] */
+  double d = 0.0;
+  for (int c = 0; c < u->C; c++) d += u->c[c] * v->c[c];
+  return d;
 }
 
 double veceuclidean(const Vec* u, const Vec* v) {
-  /* euc = ||[u] - [v]|| */
-  double euc = 0.0;
-  for (int c = 0; c < u->C; c++) euc += sqre(u->c[c] - v->c[c]);
-  return sqrt(euc);
+  /* d = ||[u] - [v]|| */
+  double d = 0.0;
+  for (int c = 0; c < u->C; c++) d += sqre(u->c[c] - v->c[c]);
+  return sqrt(d);
 }
 
-inline void vecmap(Vec* o, double (*f)(double), int C, const Vec* v) {
+inline void vecmap(Vec* o, double (* f)(double), int C, const Vec* v) {
   /* [o] = f [v] */
   for (int c = 0; c < C; c++) o->c[c] = f(v->c[c]);
 }
 
-double vecfold(double (*f)(double, double), double unit, const Vec* v) {
+double vecfold(double (* f)(double, double), double unit, const Vec* v) {
   /* acc = foldl f unit v */
   double acc = unit; // unit of monoid
   for (int c = 0; c < v->C; c++) acc = f(acc, v->c[c]);
   return acc;
 }
 
-inline void veczipwith(Vec* o, double (*f)(double, double), const Vec* u, const Vec* v) {
+inline void veczipwith(Vec* o, double (* f)(double, double), const Vec* u, const Vec* v) {
   /* [o] = [u] `f` [v] */
   for (int c = 0; c < u->C; c++) o->c[c] = f(u->c[c], v->c[c]);
 }
@@ -87,7 +88,7 @@ inline void veczipwith(Vec* o, double (*f)(double, double), const Vec* u, const 
 
 Mat* matnew(int R, int C) {
   /* Create an (R x C) matrix. */
-  Mat* m = malloc(1 * sizeof(Mat));
+  Mat* m = malloc(sizeof(Mat));
   m->R = R;
   m->C = C;
   m->r = malloc(m->R * sizeof(Vec*));
@@ -99,6 +100,7 @@ void matdel(Mat* m) {
   /* Destroy the matrix. */
   for (int r = 0; r < m->R; r++) vecdel(m->r[r]);
   free(m->r);
+  m->r = NULL;
   free(m);
 }
 

@@ -6,9 +6,12 @@
 
 #include <stdbool.h>
 
-#define WGT_RANGE 0.6  // weight initialization range; see LIR p 31
+#define WGT_RNG 0.6  // weight initialization range; see LIR p 31
 
 typedef double (* Act)(double); // activation function
+typedef struct ActPair {
+  Act f, df;
+} ActPair;
 
 extern bool istrue(const char* s);
 extern bool iszero(double x);
@@ -16,7 +19,6 @@ extern double sqre(double x);
 extern double sumsqre(double a, double c);
 extern double randin(double lo, double hi);
 extern void shuffle(int N, int* ord);
-
 extern double rampb(double x);
 extern double drampb(double);
 extern double rampu(double x);
@@ -29,6 +31,5 @@ extern double stepb(double x);
 extern double dstepb(double x);
 extern double stepu(double x);
 extern double dstepu(double x);
-extern void setact(const char* act, Act* f, Act* df);
-
+extern ActPair actpair(const char* act);
 #endif // NN_ETC_H

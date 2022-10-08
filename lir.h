@@ -15,7 +15,7 @@ typedef struct Ebp {
   int C; // number of training cycles
   int P; // number of data patterns
   bool shuffle; // shuffle input patterns
-  int* ord; // input pattern presentation order
+  int* order; // input pattern presentation order
   int L; // number of layers
   int I; // number of input taps
   int* N; // number of nodes N[l]

@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <float.h>
+#include "csv.h"
 #include "etc.h"
 #include "lir.h"
 
@@ -46,8 +47,8 @@ Ebp* ebpnew(const char* name, double eta, double alpha, double epsilon, int nC, 
    * nI: number of input taps
    * nN[]: number of nodes per layer
    * act[]: name of activation function per layer */
-  Ebp* ebp = malloc(1 * sizeof(Ebp));
-  ebp->name = strdup(name);  // malloc()
+  Ebp* ebp = malloc(sizeof(Ebp));
+  ebp->name = strndup(name, FLDSIZ);  // malloc()
   ebp->eta = eta;
   ebp->alpha = alpha;
   ebp->epsilon = epsilon;
@@ -55,8 +56,8 @@ Ebp* ebpnew(const char* name, double eta, double alpha, double epsilon, int nC, 
   ebp->C = nC;
   ebp->P = nP;
   ebp->shuffle = shuffle;
-  ebp->ord = malloc(ebp->P * sizeof(int));
-  for (int p = 0; p < ebp->P; p++) ebp->ord[p] = p;
+  ebp->order = malloc(ebp->P * sizeof(int));
+  for (int p = 0; p < ebp->P; p++) ebp->order[p] = p;
   ebp->L = nL;
   ebp->I = nI;
   ebp->N = malloc(ebp->L * sizeof(int));
@@ -73,7 +74,9 @@ Ebp* ebpnew(const char* name, double eta, double alpha, double epsilon, int nC, 
     const int J = nN[l];
     const int I = l == 0 ? ebp->I : nN[l - 1];
     ebp->N[l] = J;
-    setact(act[l], &(ebp->f[l]), &(ebp->df[l]));
+    ActPair p = actpair(act[l]);
+    ebp->f[l] = p.f;
+    ebp->df[l] = p.df;
     ebp->i[l] = l == 0 ? ebp->p : ebp->o[l - 1];  // point to upstream layer's augmented output vector
     ebp->o[l] = malloc((J + 1) * sizeof(double));
     ebp->o[l][J] = 1.0;  // bias node output
@@ -84,7 +87,7 @@ Ebp* ebpnew(const char* name, double eta, double alpha, double epsilon, int nC, 
       ebp->w[l][j] = malloc((I + 1) * sizeof(double));
       ebp->dw[l][j] = malloc((I + 1) * sizeof(double));
       for (int i = 0; i <= I; i++) {
-        ebp->w[l][j][i] = randin(-WGT_RANGE / 2.0, +WGT_RANGE / 2.0); // symmetry breaking; see LIR p 10
+        ebp->w[l][j][i] = randin(-WGT_RNG / 2.0, +WGT_RNG / 2.0); // symmetry breaking; see LIR p 10
         ebp->dw[l][j][i] = 0.0;
       }
     }
@@ -105,16 +108,27 @@ void ebpdel(Ebp* ebp) {
     free(ebp->o[l]);
   }
   free(ebp->dw);
+  ebp->dw = NULL;
   free(ebp->w);
+  ebp->w = NULL;
   free(ebp->d);
+  ebp->d = NULL;
   free(ebp->o);
+  ebp->o = NULL;
   free(ebp->i);
+  ebp->i = NULL;
   free(ebp->p);
+  ebp->p = NULL;
   free(ebp->df);
+  ebp->df = NULL;
   free(ebp->f);
+  ebp->f = NULL;
   free(ebp->N);
-  free(ebp->ord);
+  ebp->N = NULL;
+  free(ebp->order);
+  ebp->order = NULL;
   free(ebp->name);
+  ebp->name = NULL;
   free(ebp);
 }
 
@@ -168,11 +182,11 @@ void learn(Ebp* ebp, double** ii, double** tt) {
   const int lo = ebp->L - 1;
   for (int c = 0; ebp->e > ebp->epsilon && c < ebp->C; c++) {
     // learn one cycle
-    if (ebp->shuffle) shuffle(ebp->P, ebp->ord);
+    if (ebp->shuffle) shuffle(ebp->P, ebp->order);
     ebp->e = 0.0;
     for (int p = 0; p < ebp->P; p++) {
-      forward(ebp, ii[ebp->ord[p]]);
-      backward(ebp, tt[ebp->ord[p]]);
+      forward(ebp, ii[ebp->order[p]]);
+      backward(ebp, tt[ebp->order[p]]);
       for (int j = 0; j < ebp->N[lo]; j++) ebp->e += sqre(ebp->d[lo][j]); // sum of squares error; see LIR p 4
     }
     // update weights at end of cycle

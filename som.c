@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <float.h>
+#include "csv.h"
 #include "etc.h"
 #include "som.h"
 
@@ -30,7 +31,7 @@ static inline int radius(Som* som, int c) {
   /* Monotonically shrink neighborhood radius after the ordering phase. */
   if (isordering(c)) return som->radius;
   const int r = (int) (som->radius * exp(-(double) c / som->C)); // see section II-D, SOM p 1469
-  return r <= MIN_RADIUS ? MIN_RADIUS : r;
+  return r <= RADIUS_MIN ? RADIUS_MIN : r;
 }
 
 static inline int side(Som* som, int c) {
@@ -53,7 +54,7 @@ static double alpha(Som* som, int c, Loc nc, Loc n) {
   if (isordering(c)) return som->alpha;
   const double d = (sqre(n.x - nc.x) + sqre(n.y - nc.y)) / sqre(radius(som, c)); // scaled squared Euclidean distance
   const double a = som->alpha * exp(-d - (double) c / som->C); // see eq 8, section II-B, SOM p 1467
-  return a <= END_ALPHA ? END_ALPHA : a;
+  return a <= ALPHA_MIN ? ALPHA_MIN : a;
 }
 
 void dump(Som* som) {
@@ -85,8 +86,8 @@ Som* somnew(const char* name, double alpha, double epsilon, int C, int P, bool s
    * H: height of the map
    * W: width of the map
    * dist: distance measure */
-  Som* som = malloc(1 * sizeof(Som));
-  som->name = strdup(name); // malloc()
+  Som* som = malloc(sizeof(Som));
+  som->name = strndup(name, FLDSIZ); // malloc()
   som->alpha = alpha;
   if (!(0.0 < som->alpha && som->alpha < 1.0)) { // see section II-B, SOM p 1467
     fprintf(stderr, "ERROR: alpha value %f is not within the open range (0.0, 1.0)\n", som->alpha);
@@ -114,7 +115,7 @@ Som* somnew(const char* name, double alpha, double epsilon, int C, int P, bool s
     som->hits[y] = malloc(som->W * sizeof(int));
     for (int x = 0; x < som->W; x++) {
       som->m[y][x] = vecnew(som->I);
-      for (int i = 0; i < som->I; i++) som->m[y][x]->c[i] = randin(-WGT_RANGE / 2.0, +WGT_RANGE / 2.0); // symmetry breaking; see LIR p 10
+      for (int i = 0; i < som->I; i++) som->m[y][x]->c[i] = randin(-WGT_RNG / 2.0, +WGT_RNG / 2.0); // symmetry breaking; see LIR p 10
       som->hits[y][x] = 0;
     }
   }
@@ -129,11 +130,17 @@ void somdel(Som* som) {
     free(som->m[y]);
   }
   free(som->hits);
+  som->hits = NULL;
   free(som->m);
+  som->m = NULL;
   vecdel(som->i);
+  som->i = NULL;
   free(som->hood);
+  som->hood = NULL;
   free(som->ord);
+  som->ord = NULL;
   free(som->name);
+  som->name = NULL;
   free(som);
 }
 
