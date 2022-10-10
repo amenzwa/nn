@@ -211,14 +211,18 @@ void recall(Ebp* ebp, int P, double** ii, double** tt) {
   ebp->e = 0.0;
   for (int p = 0; p < P; p++) {
     // feed a test pattern
-    forward(ebp, ii[p]);
-    for (int j = 0; j < ebp->N[lo]; j++) ebp->e += sqre(tt[p][j] - ebp->o[lo][j]);
+    const double* i = ii[p];
+    const double* t = tt[p];
+    forward(ebp, i);
+    for (int j = 0; j < ebp->N[lo]; j++) ebp->e += sqre(t[j] - ebp->o[lo][j]);
     // show input-output associations
     printf("p = %-10d\n", p);
     printf("  i = ");
-    for (int j = 0; j < ebp->I; j++) printf("| %+10.4f ", ebp->i[0][j]);
+    for (int j = 0; j < ebp->I; j++) printf("| %+10.4f ", i[j]);
     printf("|\n  o = ");
     for (int j = 0; j < ebp->N[lo]; j++) printf("| %+10.4f ", ebp->o[lo][j]);
+    printf("|\n  t = ");
+    for (int j = 0; j < ebp->N[lo]; j++) printf("| %+10.4f ", t[j]);
     printf("|\n");
   }
   // report recall error
