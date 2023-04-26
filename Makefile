@@ -1,3 +1,6 @@
+# Author: Amen Zwa, Esq.
+# Copyright (c) 2022 sOnit, Inc.
+
 CC=cc
 CFLAGS=-std=c2x -O3 # -g
 
