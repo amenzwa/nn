@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <libc.h>
 #include "csv.h"
-#include "vec.h"
 #include "etc.h"
 #include "som.h"
 

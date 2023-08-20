@@ -17,10 +17,10 @@ etc.o:	etc.c etc.h
 
 # LIR
 
-lir.o:	lir.c lir.h
+lir.o:	lir.c lir.h etc.h csv.h
 	${CC} ${CFLAGS} -c lir.c
 
-lirmain.o:	lirmain.c
+lirmain.o:	lirmain.c lir.h csv.h
 	${CC} ${CFLAGS} -c lirmain.c
 
 lir:	lirmain.o lir.o etc.o csv.o
@@ -28,10 +28,10 @@ lir:	lirmain.o lir.o etc.o csv.o
 
 # SOM
 
-som.o:	som.c som.h
+som.o:	som.c som.h vec.h
 	${CC} ${CFLAGS} -c som.c
 
-sommain.o:	sommain.c
+sommain.o:	sommain.c som.h etc.h csv.h
 	${CC} ${CFLAGS} -c sommain.c
 
 som:	sommain.o som.o vec.o etc.o csv.o
