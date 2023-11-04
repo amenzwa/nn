@@ -42,20 +42,20 @@ void shuffle(int N, int* ord) {
 
 /* activation functions */
 
-inline double ramp(double x) {
-  return x;
+inline double linear(double x) {
+  return x; // linear activation function
 }
 
-inline double dramp(double /*x*/) {
-  return 1.0;
+inline double dlinear(double /*x*/) {
+  return 1.0; // derivative of linear activation function
 }
 
 inline double relu(double x) {
-  return (x > 0.0 ? 1.0 : 0.01) * x; // rectified linear unit activation function
+  return (x > 0.0 ? 1.0 : 0.01) * x; // rectified linear activation function
 }
 
 inline double drelu(double x) {
-  return x > 0.0 ? 1.0 : 0.01; // derivative of rectified linear unit activation function
+  return x > 0.0 ? 1.0 : 0.01; // derivative of rectified linear activation function
 }
 
 inline double logisticb(double x) {
@@ -91,7 +91,7 @@ inline double dstepu(double x) {
 }
 
 ActPair actpair(const char* act) {
-  if (strcmp(act, "ramp") == 0) return (ActPair) {.f = ramp, .df = dramp};
+  if (strcmp(act, "linear") == 0) return (ActPair) {.f = linear, .df = dlinear};
   else if (strcmp(act, "relu") == 0) return (ActPair) {.f = relu, .df = drelu};
   else if (strcmp(act, "logisticb") == 0) return (ActPair) {.f = logisticb, .df = dlogisticb};
   else if (strcmp(act, "logisticu") == 0) return (ActPair) {.f = logisticu, .df = dlogisticu};
