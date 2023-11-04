@@ -9,8 +9,8 @@
 #include "etc.h"
 
 inline bool iszero(double x) {
-  /* The imprecision in the FPU hardware representation of real numbers,
-   * it is impossible to check for exact zero equality like x == 0.0. */
+  /* Due to the imprecision of the FPU's representation of real numbers,
+   * it is impossible to check for exact zero equality, as in x == 0.0. */
   return fabs(x) <= 1.0e-12;
 }
 
@@ -42,20 +42,20 @@ void shuffle(int N, int* ord) {
 
 /* activation functions */
 
-inline double rampb(double x) {
+inline double ramp(double x) {
   return x;
 }
 
-inline double drampb(double /*x*/) {
+inline double dramp(double /*x*/) {
   return 1.0;
 }
 
-inline double rampu(double x) {
-  return x < 0.0 ? 0.01 : (x > 0.0 ? x : 0.0);
+inline double relu(double x) {
+  return (x > 0.0 ? 1.0 : 0.01) * x; // rectified linear unit activation function
 }
 
-inline double drampu(double x) {
-  return x < 0.0 ? 0.01 : (x > 0.0 ? 0.99 : 0.0);
+inline double drelu(double x) {
+  return x > 0.0 ? 1.0 : 0.01; // derivative of rectified linear unit activation function
 }
 
 inline double logisticb(double x) {
@@ -91,8 +91,8 @@ inline double dstepu(double x) {
 }
 
 ActPair actpair(const char* act) {
-  if (strcmp(act, "rampb") == 0) return (ActPair) {.f = rampb, .df = drampb};
-  else if (strcmp(act, "rampu") == 0) return (ActPair) {.f = rampu, .df = drampu};
+  if (strcmp(act, "ramp") == 0) return (ActPair) {.f = ramp, .df = dramp};
+  else if (strcmp(act, "relu") == 0) return (ActPair) {.f = relu, .df = drelu};
   else if (strcmp(act, "logisticb") == 0) return (ActPair) {.f = logisticb, .df = dlogisticb};
   else if (strcmp(act, "logisticu") == 0) return (ActPair) {.f = logisticu, .df = dlogisticu};
   else if (strcmp(act, "stepb") == 0) return (ActPair) {.f = stepb, .df = dstepb};
