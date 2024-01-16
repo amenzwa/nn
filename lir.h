@@ -33,6 +33,6 @@ extern Ebp* ebpnew(const char* name, double eta, double alpha, double epsilon, i
 extern void ebpdel(Ebp* ebp);
 extern void learn(Ebp* ebp, double** ii, double** tt);
 extern void recall(Ebp* ebp, int P, double** ii, double** tt);
-extern void dump(Ebp* ebp);
+extern void dump(const Ebp* ebp);
 
 #endif // NN_LIR_H

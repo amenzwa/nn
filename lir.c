@@ -13,7 +13,7 @@
 #include "etc.h"
 #include "lir.h"
 
-void dump(Ebp* ebp) {
+void dump(const Ebp* ebp) {
   /* Dump the current weights. */
   printf("dump %s weights\n", ebp->name);
   for (int l = 0; l < ebp->L; l++) {
@@ -27,7 +27,7 @@ void dump(Ebp* ebp) {
   }
 }
 
-static inline void report(Ebp* ebp, int c) {
+static inline void report(const Ebp* ebp, int c) {
   /* Report the current training cycle and current training error. */
   printf("c = %-10d  e = %-10.8f\n", c, ebp->e);
 }
@@ -74,7 +74,7 @@ Ebp* ebpnew(const char* name, double eta, double alpha, double epsilon, int nC, 
     const int J = nN[l];
     const int I = l == 0 ? ebp->I : nN[l - 1];
     ebp->N[l] = J;
-    ActPair p = actpair(act[l]);
+    const ActPair p = actpair(act[l]);
     ebp->f[l] = p.f;
     ebp->df[l] = p.df;
     ebp->i[l] = l == 0 ? ebp->p : ebp->o[l - 1];  // point to upstream layer's augmented output vector
