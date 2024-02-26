@@ -27,7 +27,7 @@ void dump(const Ebp* ebp) {
   }
 }
 
-static inline void report(const Ebp* ebp, int c) {
+inline void report(const Ebp* ebp, int c) {
   /* Report the current training cycle and current training error. */
   printf("c = %-10d  e = %-10.8f\n", c, ebp->e);
 }

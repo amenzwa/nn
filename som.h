@@ -4,7 +4,6 @@
 #ifndef NN_SOM_H
 #define NN_SOM_H
 
-#include <stdbool.h>
 #include "vec.h"
 
 #define ORDERING 1000 // number of cycles for early, ordering phase

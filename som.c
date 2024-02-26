@@ -12,29 +12,29 @@
 #include "etc.h"
 #include "som.h"
 
-static inline bool isinside(Som* som, Loc n) {
+inline bool isinside(Som* som, Loc n) {
   /* Check if node n is inside the map. */
   return 0 <= n.y && n.y < som->H && 0 <= n.x && n.x < som->W;
 }
 
-static inline bool isordering(int c) {
+inline bool isordering(int c) {
   /* Check if the learning process is still in the ordering phase. */
   return c < ORDERING; // see section II-D, SOM p 1469
 }
 
-static inline int toindex(int w, int x, int y) {
+inline int toindex(int w, int x, int y) {
   /* Convert (x, y) coordinate to 1D index. */
   return y * w + x;
 }
 
-static inline int radius(Som* som, int c) {
+inline int radius(Som* som, int c) {
   /* Monotonically shrink neighborhood radius after the ordering phase. */
   if (isordering(c)) return som->radius;
   const int r = (int) (som->radius * exp(-(double) c / som->C)); // see section II-D, SOM p 1469
   return r <= RADIUS_MIN ? RADIUS_MIN : r;
 }
 
-static inline int side(Som* som, int c) {
+inline int side(Som* som, int c) {
   /* Return the side length of the neighborhood square based on the current shrink. */
   return 1 + 2 * radius(som, c);
 }
@@ -67,7 +67,7 @@ void dump(Som* som) {
   }
 }
 
-static inline void report(Som* som, int c) {
+inline void report(Som* som, int c) {
   /* Report the current training cycle and current training error. */
   printf("c = %-10d  e = %-10.8f\n", c, som->e);
 }
