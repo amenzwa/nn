@@ -2,7 +2,6 @@
  * Copyright (c) 2022 sOnit, Inc. */
 
 #include <string.h>
-#include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
