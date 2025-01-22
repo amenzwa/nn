@@ -18,7 +18,7 @@ To learn the theory of back-propagation neural networks, read LIR (about 30 page
 
 This project is implemented in standard C, and it is self contained; it makes no references to third-party libraries. The EBP implementation includes XOR-2 and Encoder-8, two of the several example networks described by Rumelhart. The SOM implementation includes the minimum spanning tree (MST) example network described by Kohonen. For pedagogy and for clarity purposes, the code contains few error checks and even fewer code optimisations, because check and speed-up tricks obscure the algorithm. This intentional shoddiness is tolerable, since this code is meant for instructional use and not for production use.
 
-An artificial neuron produces its output by summing up its weighted input values first, then transforming this net input with a non-linear activation function. The figure below shows the artificial neuron model. All practical neural network algorithms use this neuron arranged in layers. Some algorithms, like the SOM, use a single layer of neurons. But most algorithms use multiple layers of neurons, like the EBP.
+An artificial neuron produces its output as follows: first, it sums up the weighted input values then, when the net input exceeds a certain threshold, it transforms the net input with an activation function. The threshold and the activation function are the sources of the neuron's non-linear behaviour. The figure below shows the artificial neuron model. All practical neural network algorithms use this neuron arranged in layers. Some algorithms, like the SOM, use a single layer of neurons. But most algorithms use multiple layers of neurons, like the EBP.
 
 ![artificial neuron](./doc/NeuronMcCullochPitts.jpg)
 
