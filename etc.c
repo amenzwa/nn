@@ -50,7 +50,7 @@ inline double dlinear(double /*x*/) {
 }
 
 inline double relu(double x) {
-  return x > 0.0 ? 1.0 * x : 0.01; // rectified linear activation function
+  return x > 0.0 ? x : 0.01; // rectified linear activation function
 }
 
 inline double drelu(double x) {
